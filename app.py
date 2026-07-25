@@ -25,7 +25,7 @@ SHEET_URL = (
     "export?format=csv&gid=0"
 )
 
-# Caminhos dos arquivos
+# Caminhos de arquivos usando busca dinâmica
 PASTA_PROJETO = Path(__file__).resolve().parent
 PASTA_ASSETS = PASTA_PROJETO / "assets"
 
@@ -58,7 +58,7 @@ if "carrinho" not in st.session_state:
 if "categoria_selecionada" not in st.session_state:
     st.session_state.categoria_selecionada = "TODOS OS PRODUTOS"
 
-# ---------------- ESTILO CSS LIMPO E ESTÁVEL ---------------- #
+# ---------------- ESTILO CSS SEGURO E ESTÁVEL ---------------- #
 
 st.markdown(
     """
@@ -79,7 +79,7 @@ st.markdown(
 
     .block-container {
         max-width: 1400px;
-        padding-top: 1.5rem !important;
+        padding-top: 2rem !important;
         padding-bottom: 2rem;
     }
 
@@ -87,7 +87,7 @@ st.markdown(
         background-color: #101319 !important;
     }
 
-    /* Destaque do botão de abrir/fechar o carrinho */
+    /* Destaque discreto do botão do carrinho no topo */
     button[data-testid="stHeaderNavStateButton"],
     button[data-testid="stSidebarCollapseButton"] {
         background-color: var(--azul) !important;
@@ -112,7 +112,7 @@ st.markdown(
         max-width: 760px;
     }
 
-    /* Campo de Busca */
+    /* Campo de Busca (Garante texto escuro e bem visível) */
     div[data-testid="stTextInput"] input {
         background-color: #ffffff !important;
         color: #183b5e !important;
@@ -126,20 +126,7 @@ st.markdown(
         opacity: 1 !important;
     }
 
-    /* Banner discreto do carrinho */
-    .alerta-carrinho-mobile {
-        background-color: #183b5e;
-        color: #ffffff;
-        padding: 8px 12px;
-        border-radius: 8px;
-        text-align: center;
-        font-weight: 700;
-        font-size: 0.9rem;
-        margin-bottom: 15px;
-        border: 2px solid #e9b83f;
-    }
-
-    /* Estilização dos cards de produto */
+    /* Cards de Produtos */
     div[data-testid="stVerticalBlockBorderWrapper"] {
         background: #ffffff;
         border: 1px solid #e1e7ed !important;
@@ -355,7 +342,7 @@ def set_categoria(categoria):
     st.session_state.categoria_selecionada = categoria
 
 
-# ---------------- BARRA LATERAL (CARRINHO REESTRUTURADO) ---------------- #
+# ---------------- BARRA LATERAL (CARRINHO ESTÁVEL) ---------------- #
 
 with st.sidebar:
     total_itens = sum(item["qtd"] for item in st.session_state.carrinho.values())
@@ -374,10 +361,9 @@ with st.sidebar:
             total_subitens += subtotal
 
             st.markdown("<hr style='margin: 0.5rem 0; border-color: rgba(255,255,255,0.1);'>", unsafe_allow_html=True)
-
             st.markdown(f"<div class='item-carrinho-titulo'>{item}</div>", unsafe_allow_html=True)
 
-            # Controles simples e robustos
+            # Layout limpo para botões do carrinho
             col_botoes, col_subtotal = st.columns([2, 2])
 
             with col_botoes:
@@ -432,17 +418,6 @@ with st.sidebar:
         st.button("🗑️ Limpar Carrinho", on_click=esvaziar_carrinho, use_container_width=True)
 
 # ---------------- CABEÇALHO ---------------- #
-
-total_itens_atual = sum(item["qtd"] for item in st.session_state.carrinho.values())
-if total_itens_atual > 0:
-    st.markdown(
-        f"""
-        <div class="alerta-carrinho-mobile">
-            🛒 <b>Ver carrinho ({total_itens_atual} itens)</b> — Clique na seta no canto superior esquerdo (<b>>></b>)
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
 
 col_logo, col_texto = st.columns([1.1, 5])
 
