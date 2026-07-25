@@ -25,7 +25,6 @@ SHEET_URL = (
     "export?format=csv&gid=0"
 )
 
-# Define a pasta raiz do projeto usando caminho absoluto
 PASTA_PROJETO = Path(__file__).resolve().parent
 PASTA_ASSETS = PASTA_PROJETO / "assets"
 
@@ -57,7 +56,7 @@ if "carrinho" not in st.session_state:
 if "categoria_selecionada" not in st.session_state:
     st.session_state.categoria_selecionada = "TODOS OS PRODUTOS"
 
-# ---------------- ESTILO CSS CORRIGIDO ---------------- #
+# ---------------- ESTILO CSS CORRIGIDO E OTIMIZADO ---------------- #
 
 st.markdown(
     """
@@ -76,68 +75,110 @@ st.markdown(
         color: var(--azul);
     }
 
+    /* PONTO 1: Reduz espaçamento do topo para produtos aparecerem logo no mobile */
     .block-container {
         max-width: 1500px;
-        padding-top: 2rem !important;
-        padding-bottom: 3rem;
+        padding-top: 1rem !important;
+        padding-bottom: 2rem;
     }
 
     header[data-testid="stHeader"] {
         background-color: #101319;
     }
 
+    /* PONTO 3: Estilização do botão de abrir o carrinho (canto superior esquerdo) */
+    button[data-testid="stHeaderNavStateButton"],
+    button[data-testid="stSidebarCollapseButton"],
+    section[data-testid="stSidebar"] button[aria-label="Close sidebar"] {
+        background-color: var(--azul) !important;
+        border: 2px solid var(--dourado) !important;
+        border-radius: 8px !important;
+        color: #ffffff !important;
+    }
+
     .marca {
         color: var(--azul);
-        font-size: 1.7rem;
+        font-size: 1.5rem;
         font-weight: 850;
         line-height: 1.15;
         margin: 0;
     }
 
-    .subtitulo {
-        color: var(--dourado);
-        font-size: 1rem;
-        font-weight: 800;
-        letter-spacing: 0.08rem;
-        margin: 0.25rem 0 0;
-        text-transform: uppercase;
-    }
-
     .apresentacao-catalogo {
         color: #475569;
-        font-size: 0.96rem;
-        line-height: 1.5;
-        margin-top: 0.45rem;
+        font-size: 0.88rem;
+        line-height: 1.35;
+        margin-top: 0.25rem;
         max-width: 760px;
     }
 
-    /* CORREÇÃO 1: Campo de Busca (Garante texto escuro e visível) */
+    /* Campo de Busca (Texto escuro e legível) */
     div[data-testid="stTextInput"] input {
         background-color: #ffffff !important;
-        color: #183b5e !important; /* Cor do texto digitado */
+        color: #183b5e !important;
         font-weight: 600 !important;
         border: 2px solid #183b5e !important;
         border-radius: 8px !important;
     }
 
     div[data-testid="stTextInput"] input::placeholder {
-        color: #64748b !important; /* Cor do texto de dica (placeholder) */
+        color: #64748b !important;
         opacity: 1 !important;
     }
 
-    /* CORREÇÃO 2: Estilo do aviso do carrinho para telemóveis */
+    /* PONTO 2: Aviso simplificado do carrinho */
     .alerta-carrinho-mobile {
         background-color: #183b5e;
         color: #ffffff;
-        padding: 10px 15px;
-        border-radius: 10px;
+        padding: 8px 12px;
+        border-radius: 8px;
         text-align: center;
         font-weight: 700;
-        font-size: 0.95rem;
-        margin-bottom: 15px;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
         border: 2px solid #e9b83f;
     }
 
+    /* PONTO 1: Mantém os botões de categoria em linha no mobile */
+    div[data-testid="stHorizontalBlock"]:has([class*="st-key-categoria_"]) {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        gap: 6px !important;
+        overflow-x: auto !important;
+    }
+
+    [class*="st-key-categoria_"] button {
+        background-color: #ffffff !important;
+        border: 2px solid var(--azul) !important;
+        color: var(--azul) !important;
+        white-space: nowrap !important;
+        font-size: 0.85rem !important;
+        padding: 4px 8px !important;
+    }
+
+    [class*="st-key-categoria_"] button[kind="primary"],
+    [class*="st-key-categoria_"] button[kind="primary"]:hover {
+        background-color: #183B5E !important;
+        border-color: #183B5E !important;
+        color: #ffffff !important;
+    }
+
+    /* PONTO 4: CORREÇÃO CRÍTICA DO CARRINHO NO MOBILE */
+    /* Impede que os botões -, quantidade e + dobrem para a vertical */
+    section[data-testid="stSidebar"] div[data-testid="stHorizontalBlock"] {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+    }
+
+    section[data-testid="stSidebar"] div[data-testid="column"] {
+        min-width: 0 !important;
+        flex: 1 1 auto !important;
+    }
+
+    /* Estilos dos Cards de Produtos */
     div[data-testid="stVerticalBlockBorderWrapper"] {
         background: #ffffff;
         border: 1px solid #e1e7ed !important;
@@ -158,37 +199,35 @@ st.markdown(
 
     .produto-titulo {
         color: var(--azul);
-        font-size: 1.02rem;
+        font-size: 0.98rem;
         font-weight: 800;
-        line-height: 1.25;
-        margin: 0.55rem 0 0.2rem;
-        min-height: 0;
+        line-height: 1.2;
+        margin: 0.4rem 0 0.2rem;
         text-align: center;
     }
 
     .produto-desc {
         color: #64748b;
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         font-weight: 600;
-        line-height: 1.35;
-        min-height: 0;
+        line-height: 1.3;
         text-align: center;
     }
 
     .produto-regra-minima {
         color: #1B44BF;
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         font-weight: 700;
-        line-height: 1.35;
+        line-height: 1.3;
         margin-top: 0.1rem;
         text-align: center;
     }
 
     .produto-preco {
         color: var(--azul);
-        font-size: 1.55rem;
+        font-size: 1.4rem;
         font-weight: 900;
-        margin: 0.45rem 0 0.55rem;
+        margin: 0.35rem 0 0.45rem;
         text-align: center;
     }
 
@@ -198,7 +237,7 @@ st.markdown(
 
     div[data-testid="stVerticalBlockBorderWrapper"] button[kind="primary"] {
         border-radius: 999px;
-        min-height: 2.8rem;
+        min-height: 2.6rem;
     }
 
     button[kind="primary"] {
@@ -213,23 +252,6 @@ st.markdown(
         background-color: var(--dourado) !important;
         border-color: var(--dourado) !important;
         color: var(--azul) !important;
-    }
-
-    [class*="st-key-categoria_"] button {
-        background-color: #ffffff !important;
-        border: 2px solid var(--azul) !important;
-        color: var(--azul) !important;
-    }
-
-    [class*="st-key-categoria_"] button[kind="primary"],
-    [class*="st-key-categoria_"] button[kind="primary"]:hover {
-        background-color: #183B5E !important;
-        border-color: #183B5E !important;
-        color: #ffffff !important;
-    }
-
-    [class*="st-key-categoria_"] button[kind="secondary"]:hover {
-        background-color: #f2f6fa !important;
     }
 
     section[data-testid="stSidebar"] {
@@ -252,7 +274,6 @@ st.markdown(
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-top: 2px;
     }
 
     section[data-testid="stSidebar"] div[data-testid="column"] .stButton button {
@@ -260,28 +281,8 @@ st.markdown(
         height: 32px !important;
         min-height: 32px !important;
         padding: 0 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
         border-radius: 6px !important;
-        font-size: 1.2rem !important;
-        line-height: 1 !important;
-        position: relative !important;
-    }
-
-    section[data-testid="stSidebar"] div[data-testid="column"] .stButton button > * {
-        position: absolute !important;
-        inset: 0 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-
-    section[data-testid="stSidebar"] div[data-testid="column"] .stButton button p,
-    section[data-testid="stSidebar"] div[data-testid="column"] .stButton button span {
-        margin: 0 !important;
-        line-height: 1 !important;
-        transform: none !important;
+        font-size: 1.1rem !important;
     }
 
     .qtd-valor {
@@ -290,23 +291,21 @@ st.markdown(
         justify-content: center;
         height: 32px;
         font-weight: bold;
-        font-size: 1.15rem;
+        font-size: 1.1rem;
         color: #ffffff;
-        margin-top: 2px;
     }
 
     .subtotal-valor {
         text-align: right;
-        font-size: 1.05rem;
+        font-size: 0.95rem;
         font-weight: 700;
         color: #ffffff;
-        margin-top: 6px;
     }
 
     .rodape {
         color: #64748b;
-        font-size: 0.9rem;
-        margin-top: 3rem;
+        font-size: 0.85rem;
+        margin-top: 2.5rem;
         text-align: center;
     }
 </style>
@@ -437,7 +436,7 @@ def adicionar_ao_carrinho(nome, preco):
         st.session_state.carrinho[nome]["qtd"] += 1
     else:
         st.session_state.carrinho[nome] = {"preco": preco, "qtd": 1}
-    st.toast(f"✅ {nome} adicionado! Clique na seta '>>' no topo superior para ver seu pedido.", icon="🛒")
+    st.toast(f"✅ {nome} adicionado ao carrinho!", icon="🛒")
 
 
 def remover_do_carrinho(nome):
@@ -496,12 +495,13 @@ with st.sidebar:
                 c_nome, c_tag_sub = st.columns([2.5, 1.5])
                 with c_nome:
                     st.markdown(
-                        f"<div style='font-size:0.95rem; font-weight:700; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;'>{item}</div>",
+                        f"<div style='font-size:0.9rem; font-weight:700; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;'>{item}</div>",
                         unsafe_allow_html=True)
                 with c_tag_sub:
-                    st.markdown("<div style='font-size:0.8rem; color:#9dbbd4; text-align:right;'>Subtotal</div>",
+                    st.markdown("<div style='font-size:0.75rem; color:#9dbbd4; text-align:right;'>Subtotal</div>",
                                 unsafe_allow_html=True)
 
+                # PONTO 4: Mantém -, qtd, + e subtotal na mesma linha horizontal
                 c_menos, c_qtd, c_mais, c_sub = st.columns([0.8, 0.8, 0.8, 2.5])
                 with c_menos:
                     st.button("−", key=f"rem_{item}", on_click=remover_do_carrinho, args=(item,))
@@ -568,14 +568,13 @@ with st.sidebar:
 
 # ---------------- CABEÇALHO ---------------- #
 
-# Indicador em destaque no topo para telemóveis informando sobre o carrinho
+# PONTO 2: Texto resumido do aviso do carrinho
 total_itens_atual = sum(item["qtd"] for item in st.session_state.carrinho.values())
 if total_itens_atual > 0:
     st.markdown(
         f"""
         <div class="alerta-carrinho-mobile">
-            🛒 <b>Seu Pedido tem {total_itens_atual} item(ns)!</b><br>
-            <span style="font-size:0.85rem; font-weight:normal;">Clique na seta <b>'>>'</b> no canto superior esquerdo para ver o carrinho e finalizar.</span>
+            🛒 <b>Ver carrinho ({total_itens_atual} itens)</b>
         </div>
         """,
         unsafe_allow_html=True,
@@ -585,7 +584,7 @@ col_logo, col_texto = st.columns([1.1, 5])
 
 with col_logo:
     if CAMINHO_LOGO and CAMINHO_LOGO.exists():
-        st.image(carregar_logo(str(CAMINHO_LOGO)), width=175)
+        st.image(carregar_logo(str(CAMINHO_LOGO)), width=150)
     else:
         st.warning("Logo não encontrada na pasta assets/.")
 
@@ -598,10 +597,7 @@ with col_texto:
         """
         <div class="apresentacao-catalogo">
             &#128230; Bebidas e Alimentos para estabelecimentos e festas<br>
-            &#128666; Entrega rápida em Patos de Minas e região<br>
-            &#128071; Confira nosso catálogo e faça seu pedido<br>
-            Para realizar seu pedido, basta escolher os produtos e a quantidade desejada.
-            Depois de fazer a seleção, seu pedido será finalizado via WhatsApp.
+            &#128666; Entrega rápida em Patos de Minas e região
         </div>
         """,
         unsafe_allow_html=True,
