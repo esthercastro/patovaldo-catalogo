@@ -25,7 +25,7 @@ SHEET_URL = (
     "export?format=csv&gid=0"
 )
 
-# Caminhos de arquivos
+# Caminhos dos arquivos
 PASTA_PROJETO = Path(__file__).resolve().parent
 PASTA_ASSETS = PASTA_PROJETO / "assets"
 
@@ -50,7 +50,7 @@ def buscar_imagem(nome_base: str) -> Path | None:
 
 CAMINHO_LOGO = buscar_imagem("logo")
 CAMINHO_MAPA = buscar_imagem("mapa_zonas")
-CAMINHO_CARRINHO = buscar_imagem("carrinho")  # Busca a nova imagem enviada para assets
+CAMINHO_CARRINHO = buscar_imagem("carrinho")
 
 if "carrinho" not in st.session_state:
     st.session_state.carrinho = {}
@@ -58,7 +58,7 @@ if "carrinho" not in st.session_state:
 if "categoria_selecionada" not in st.session_state:
     st.session_state.categoria_selecionada = "TODOS OS PRODUTOS"
 
-# ---------------- ESTILO CSS DEFINITIVO ---------------- #
+# ---------------- ESTILO CSS LIMPO E ESTÁVEL ---------------- #
 
 st.markdown(
     """
@@ -77,47 +77,28 @@ st.markdown(
         color: var(--azul);
     }
 
-    /* Reduz espaço do topo no celular para exibir produtos rapidamente */
     .block-container {
-        max-width: 1500px;
-        padding-top: 1rem !important;
+        max-width: 1400px;
+        padding-top: 1.5rem !important;
         padding-bottom: 2rem;
     }
 
-    /* Garante que o cabeçalho nativo não tape os botões */
     header[data-testid="stHeader"] {
-        background-color: transparent !important;
-        z-index: 100 !important;
+        background-color: #101319 !important;
     }
 
-    /* Destaque para o botão nativo de abrir a barra lateral (seta '>>') */
+    /* Destaque do botão de abrir/fechar o carrinho */
     button[data-testid="stHeaderNavStateButton"],
-    button[data-testid="stSidebarCollapseButton"],
-    section[data-testid="stSidebar"] button[aria-label="Close sidebar"] {
-        background-color: #183b5e !important;
-        border: 2px solid #e9b83f !important;
-        border-radius: 8px !important;
+    button[data-testid="stSidebarCollapseButton"] {
+        background-color: var(--azul) !important;
+        border: 2px solid var(--dourado) !important;
         color: #ffffff !important;
-        font-weight: bold !important;
-    }
-
-    /* Banner fixo de alerta do carrinho para mobile */
-    .alerta-carrinho-mobile {
-        background-color: #183b5e;
-        color: #ffffff;
-        padding: 10px 14px;
-        border-radius: 10px;
-        text-align: center;
-        font-weight: 700;
-        font-size: 0.92rem;
-        margin-bottom: 12px;
-        border: 2px solid #e9b83f;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border-radius: 8px !important;
     }
 
     .marca {
         color: var(--azul);
-        font-size: 1.4rem;
+        font-size: 1.6rem;
         font-weight: 850;
         line-height: 1.15;
         margin: 0;
@@ -125,9 +106,9 @@ st.markdown(
 
     .apresentacao-catalogo {
         color: #475569;
-        font-size: 0.85rem;
-        line-height: 1.3;
-        margin-top: 0.2rem;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        margin-top: 0.3rem;
         max-width: 760px;
     }
 
@@ -145,90 +126,32 @@ st.markdown(
         opacity: 1 !important;
     }
 
-    /* Botões de Categoria lado a lado sem quebra no mobile */
-    div[data-testid="stHorizontalBlock"]:has([class*="st-key-categoria_"]) {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        gap: 6px !important;
-        overflow-x: auto !important;
-    }
-
-    [class*="st-key-categoria_"] button {
-        background-color: #ffffff !important;
-        border: 2px solid var(--azul) !important;
-        color: var(--azul) !important;
-        white-space: nowrap !important;
-        font-size: 0.82rem !important;
-        padding: 4px 8px !important;
-    }
-
-    [class*="st-key-categoria_"] button[kind="primary"],
-    [class*="st-key-categoria_"] button[kind="primary"]:hover {
-        background-color: #183B5E !important;
-        border-color: #183B5E !important;
-        color: #ffffff !important;
-    }
-
-    /* CORREÇÃO DOS BOTÕES NO CARRINHO ABERTO (FLUIDEZ NO MOBILE) */
-    section[data-testid="stSidebar"] div[data-testid="stHorizontalBlock"] {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        gap: 4px !important;
-    }
-
-    section[data-testid="stSidebar"] div[data-testid="column"] {
-        min-width: 0 !important;
-        flex: 1 1 auto !important;
-    }
-
-    section[data-testid="stSidebar"] {
-        background-color: var(--azul-escuro) !important;
-        width: 85vw !important; /* Limita a largura para não tapar 100% da tela */
-        max-width: 420px !important;
-    }
-
-    section[data-testid="stSidebar"] button[kind="secondary"] {
-        background-color: rgba(255, 255, 255, 0.12) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        color: #ffffff !important;
-        border-radius: 6px;
-    }
-
-    .qtd-valor {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 1rem;
+    /* Banner discreto do carrinho */
+    .alerta-carrinho-mobile {
+        background-color: #183b5e;
         color: #ffffff;
-    }
-
-    .subtotal-valor {
-        text-align: right;
-        font-size: 0.9rem;
+        padding: 8px 12px;
+        border-radius: 8px;
+        text-align: center;
         font-weight: 700;
-        color: #ffffff;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+        border: 2px solid #e9b83f;
     }
 
-    /* Cards dos produtos na loja */
+    /* Estilização dos cards de produto */
     div[data-testid="stVerticalBlockBorderWrapper"] {
         background: #ffffff;
         border: 1px solid #e1e7ed !important;
-        border-radius: 16px;
-        box-shadow: 0 3px 10px rgba(15, 44, 71, 0.10);
+        border-radius: 14px;
+        box-shadow: 0 3px 10px rgba(15, 44, 71, 0.08);
         height: 100%;
-        min-height: 0;
-        overflow: hidden;
         padding: 0.75rem;
     }
 
     .produto-titulo {
         color: var(--azul);
-        font-size: 0.98rem;
+        font-size: 1rem;
         font-weight: 800;
         line-height: 1.2;
         margin: 0.4rem 0 0.2rem;
@@ -237,7 +160,7 @@ st.markdown(
 
     .produto-desc {
         color: #64748b;
-        font-size: 0.78rem;
+        font-size: 0.8rem;
         font-weight: 600;
         line-height: 1.3;
         text-align: center;
@@ -245,7 +168,7 @@ st.markdown(
 
     .produto-regra-minima {
         color: #1B44BF;
-        font-size: 0.78rem;
+        font-size: 0.8rem;
         font-weight: 700;
         line-height: 1.3;
         margin-top: 0.1rem;
@@ -254,10 +177,28 @@ st.markdown(
 
     .produto-preco {
         color: var(--azul);
-        font-size: 1.4rem;
+        font-size: 1.45rem;
         font-weight: 900;
-        margin: 0.35rem 0 0.45rem;
+        margin: 0.4rem 0 0.5rem;
         text-align: center;
+    }
+
+    /* Estilo da Barra Lateral (Carrinho) */
+    section[data-testid="stSidebar"] {
+        background-color: var(--azul-escuro) !important;
+    }
+
+    .item-carrinho-titulo {
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+    }
+
+    .item-carrinho-subtotal {
+        color: #e9b83f;
+        font-weight: 700;
+        font-size: 0.9rem;
     }
 
     .rodape {
@@ -414,70 +355,50 @@ def set_categoria(categoria):
     st.session_state.categoria_selecionada = categoria
 
 
-# ---------------- BARRA LATERAL (CARRINHO) ---------------- #
+# ---------------- BARRA LATERAL (CARRINHO REESTRUTURADO) ---------------- #
 
 with st.sidebar:
     total_itens = sum(item["qtd"] for item in st.session_state.carrinho.values())
 
-    # Exibe o ícone do carrinho se a imagem existir
-    col_tit_img, col_tit_txt = st.columns([1, 4])
-    with col_tit_img:
-        if CAMINHO_CARRINHO and CAMINHO_CARRINHO.exists():
-            st.image(str(CAMINHO_CARRINHO), width=35)
-        else:
-            st.write("🛒")
-    with col_tit_txt:
-        st.markdown(f"<h3 style='color:#ffffff; margin:0;'>Seu Pedido ({total_itens})</h3>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='color:#ffffff; margin-bottom:10px;'>🛒 Seu Pedido ({total_itens})</h2>",
+                unsafe_allow_html=True)
 
     if not st.session_state.carrinho:
         st.info("Seu carrinho está vazio. Adicione produtos do catálogo!")
     else:
         df_catalogo = carregar_dados()
-        st.markdown(
-            "<p style='color:#e9b83f; font-weight:700; margin-bottom:5px; font-size:1rem;'>Resumo do Pedido</p>",
-            unsafe_allow_html=True)
-
         total_subitens = 0
 
         for item, dados in list(st.session_state.carrinho.items()):
             subtotal = dados["qtd"] * dados["preco"]
             total_subitens += subtotal
 
-            st.markdown("<hr style='margin: 0.4rem 0; border-color: rgba(255,255,255,0.08);'>", unsafe_allow_html=True)
+            st.markdown("<hr style='margin: 0.5rem 0; border-color: rgba(255,255,255,0.1);'>", unsafe_allow_html=True)
 
-            linha_produto = df_catalogo[df_catalogo["Produto"] == item]
-            link_foto = linha_produto["Foto"].iloc[0] if not linha_produto.empty else None
+            st.markdown(f"<div class='item-carrinho-titulo'>{item}</div>", unsafe_allow_html=True)
 
-            # Layout corrigido com colunas otimizadas
-            col_img, col_info = st.columns([1.2, 2.8], gap="small")
+            # Controles simples e robustos
+            col_botoes, col_subtotal = st.columns([2, 2])
 
-            with col_img:
-                if pd.notna(link_foto) and str(link_foto).strip():
-                    st.image(preparar_imagem_produto(str(link_foto)), use_container_width=True)
-                else:
-                    imagem_vazia = Image.new("RGB", (700, 560), (248, 251, 254))
-                    st.image(imagem_vazia, use_container_width=True)
-
-            with col_info:
-                st.markdown(f"<div style='font-size:0.85rem; font-weight:700; color:#ffffff;'>{item}</div>",
-                            unsafe_allow_html=True)
-
-                # Controles horizontais alinhados
-                c_menos, c_qtd, c_mais = st.columns([1, 1, 1])
-                with c_menos:
+            with col_botoes:
+                btn_rem, txt_qtd, btn_add = st.columns([1, 1, 1])
+                with btn_rem:
                     st.button("−", key=f"rem_{item}", on_click=remover_do_carrinho, args=(item,))
-                with c_qtd:
-                    st.markdown(f"<div class='qtd-valor'>{dados['qtd']}</div>", unsafe_allow_html=True)
-                with c_mais:
+                with txt_qtd:
+                    st.markdown(
+                        f"<div style='text-align:center; color:#ffffff; font-weight:bold; margin-top:4px;'>{dados['qtd']}</div>",
+                        unsafe_allow_html=True)
+                with btn_add:
                     st.button("＋", key=f"add_{item}", on_click=adicionar_ao_carrinho, args=(item, dados["preco"]))
 
-                st.markdown(f"<div class='subtotal-valor'>Subtotal: R$ {formatar_preco(subtotal)}</div>",
-                            unsafe_allow_html=True)
-
-        st.markdown("<hr style='margin: 0.5rem 0 1rem 0; border-color: rgba(255,255,255,0.08);'>",
+            with col_subtotal:
+                st.markdown(
+                    f"<div class='item-carrinho-subtotal' style='text-align:right; margin-top:4px;'>R$ {formatar_preco(subtotal)}</div>",
                     unsafe_allow_html=True)
 
-        st.markdown("### Informações de Entrega")
+        st.markdown("<hr style='margin: 1rem 0; border-color: rgba(255,255,255,0.1);'>", unsafe_allow_html=True)
+
+        st.markdown("<h4 style='color:#ffffff;'>Informações de Entrega</h4>", unsafe_allow_html=True)
         endereco_cliente = st.text_input(
             "Endereço de entrega (Obrigatório):",
             placeholder="Ex: Rua das Flores, 123"
@@ -487,7 +408,8 @@ with st.sidebar:
             st.image(str(CAMINHO_MAPA), caption="Zonas de Entrega e Taxas")
 
         st.divider()
-        st.markdown(f"### Total: R$ {formatar_preco(total_subitens)} + Taxa")
+        st.markdown(f"<h3 style='color:#ffffff;'>Total: R$ {formatar_preco(total_subitens)} + Taxa</h3>",
+                    unsafe_allow_html=True)
 
         resumo_whatsapp = "Olá! Gostaria de fazer o seguinte pedido:\n\n"
         for item, dados in list(st.session_state.carrinho.items()):
@@ -501,7 +423,7 @@ with st.sidebar:
 
         st.markdown(f"""
             <a href="{link_whatsapp}" target="_blank" style="text-decoration:none;">
-                <div style="background-color:#25D366; color:white; padding:10px; text-align:center; border-radius:8px; font-weight:800; font-size:1rem; margin-bottom:10px;">
+                <div style="background-color:#25D366; color:white; padding:12px; text-align:center; border-radius:8px; font-weight:800; font-size:1rem; margin-top:10px;">
                     ✅ Finalizar Pedido no WhatsApp
                 </div>
             </a>
@@ -516,8 +438,7 @@ if total_itens_atual > 0:
     st.markdown(
         f"""
         <div class="alerta-carrinho-mobile">
-            🛒 <b>Ver carrinho ({total_itens_atual} itens)</b><br>
-            <span style="font-size:0.8rem; font-weight:normal;">Clique no botão <b>'>>'</b> no topo superior esquerdo para abrir seu pedido.</span>
+            🛒 <b>Ver carrinho ({total_itens_atual} itens)</b> — Clique na seta no canto superior esquerdo (<b>>></b>)
         </div>
         """,
         unsafe_allow_html=True,
@@ -527,7 +448,7 @@ col_logo, col_texto = st.columns([1.1, 5])
 
 with col_logo:
     if CAMINHO_LOGO and CAMINHO_LOGO.exists():
-        st.image(carregar_logo(str(CAMINHO_LOGO)), width=130)
+        st.image(carregar_logo(str(CAMINHO_LOGO)), width=140)
 
 with col_texto:
     st.markdown('<p class="marca">PATOVALDO DISTRIBUIDORA</p>', unsafe_allow_html=True)
