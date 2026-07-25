@@ -9,7 +9,6 @@ from io import BytesIO
 from pathlib import Path
 from PIL import Image, ImageChops
 
-
 # ---------------- CONFIGURAÇÕES ---------------- #
 
 st.set_page_config(
@@ -30,26 +29,24 @@ SHEET_URL = (
 PASTA_PROJETO = Path(__file__).resolve().parent
 PASTA_ASSETS = PASTA_PROJETO / "assets"
 
+
 def buscar_imagem(nome_base: str) -> Path | None:
-    """
-    Procura um arquivo dentro da pasta 'assets' testando várias
-    extensões de imagem comuns para evitar falhas por causa do formato.
-    """
+    """Procura um arquivo na pasta 'assets' testando várias extensões."""
     if not PASTA_ASSETS.exists():
         return None
-        
+
     extensoes = [".png", ".jpg", ".jpeg", ".webp", ".PNG", ".JPG", ".JPEG"]
     for ext in extensoes:
         caminho_teste = PASTA_ASSETS / f"{nome_base}{ext}"
         if caminho_teste.exists():
             return caminho_teste
-            
-    # Se não encontrar com extensão exata, procura por correspondência no nome do arquivo
+
     for arquivo in PASTA_ASSETS.iterdir():
         if arquivo.stem.lower() == nome_base.lower():
             return arquivo
-            
+
     return None
+
 
 CAMINHO_LOGO = buscar_imagem("logo")
 CAMINHO_MAPA = buscar_imagem("mapa_zonas")
@@ -60,8 +57,7 @@ if "carrinho" not in st.session_state:
 if "categoria_selecionada" not in st.session_state:
     st.session_state.categoria_selecionada = "TODOS OS PRODUTOS"
 
-
-# ---------------- ESTILO ---------------- #
+# ---------------- ESTILO CSS CORRIGIDO ---------------- #
 
 st.markdown(
     """
@@ -82,7 +78,7 @@ st.markdown(
 
     .block-container {
         max-width: 1500px;
-        padding-top: 3rem !important;
+        padding-top: 2rem !important;
         padding-bottom: 3rem;
     }
 
@@ -113,6 +109,33 @@ st.markdown(
         line-height: 1.5;
         margin-top: 0.45rem;
         max-width: 760px;
+    }
+
+    /* CORREÇÃO 1: Campo de Busca (Garante texto escuro e visível) */
+    div[data-testid="stTextInput"] input {
+        background-color: #ffffff !important;
+        color: #183b5e !important; /* Cor do texto digitado */
+        font-weight: 600 !important;
+        border: 2px solid #183b5e !important;
+        border-radius: 8px !important;
+    }
+
+    div[data-testid="stTextInput"] input::placeholder {
+        color: #64748b !important; /* Cor do texto de dica (placeholder) */
+        opacity: 1 !important;
+    }
+
+    /* CORREÇÃO 2: Estilo do aviso do carrinho para telemóveis */
+    .alerta-carrinho-mobile {
+        background-color: #183b5e;
+        color: #ffffff;
+        padding: 10px 15px;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 0.95rem;
+        margin-bottom: 15px;
+        border: 2px solid #e9b83f;
     }
 
     div[data-testid="stVerticalBlockBorderWrapper"] {
@@ -169,7 +192,6 @@ st.markdown(
         text-align: center;
     }
 
-    /* Espaçamento visual do card de cada produto. */
     div[data-testid="stVerticalBlockBorderWrapper"] div[data-testid="stImage"] img {
         border-radius: 8px;
     }
@@ -179,7 +201,6 @@ st.markdown(
         min-height: 2.8rem;
     }
 
-    /* Botões área principal */
     button[kind="primary"] {
         background-color: var(--azul) !important;
         border: 2px solid var(--azul) !important;
@@ -192,11 +213,6 @@ st.markdown(
         background-color: var(--dourado) !important;
         border-color: var(--dourado) !important;
         color: var(--azul) !important;
-    }
-
-    /* Campo de busca e filtros do catálogo. */
-    div[data-testid="stTextInput"] input {
-        background-color: #ffffff !important;
     }
 
     [class*="st-key-categoria_"] button {
@@ -216,31 +232,29 @@ st.markdown(
         background-color: #f2f6fa !important;
     }
 
-    /* Ajustes Específicos para a Sidebar (Carrinho) */
     section[data-testid="stSidebar"] {
         background-color: var(--azul-escuro) !important;
     }
-    
-    /* Configuração padrão para botões secundários gerais na sidebar */
+
     section[data-testid="stSidebar"] button[kind="secondary"] {
         background-color: rgba(255, 255, 255, 0.08) !important;
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
         color: #ffffff !important;
         border-radius: 6px;
     }
-    
+
     section[data-testid="stSidebar"] button[kind="secondary"]:hover {
         background-color: rgba(255, 255, 255, 0.2) !important;
         border-color: #ffffff !important;
     }
-    
+
     section[data-testid="stSidebar"] div[data-testid="column"] .stButton {
         display: flex;
         justify-content: center;
         align-items: center;
         margin-top: 2px;
     }
-    
+
     section[data-testid="stSidebar"] div[data-testid="column"] .stButton button {
         width: 32px !important;
         height: 32px !important;
@@ -255,7 +269,6 @@ st.markdown(
         position: relative !important;
     }
 
-    /* Centraliza o texto interno que o Streamlit insere no botão. */
     section[data-testid="stSidebar"] div[data-testid="column"] .stButton button > * {
         position: absolute !important;
         inset: 0 !important;
@@ -270,8 +283,7 @@ st.markdown(
         line-height: 1 !important;
         transform: none !important;
     }
-    
-    /* Alinhamento numérico da quantidade */
+
     .qtd-valor {
         display: flex;
         align-items: center;
@@ -283,7 +295,6 @@ st.markdown(
         margin-top: 2px;
     }
 
-    /* Alinhamento do valor de Subtotal */
     .subtotal-valor {
         text-align: right;
         font-size: 1.05rem;
@@ -410,7 +421,6 @@ def formatar_preco(preco):
 
 
 def formatar_descricao_produto(descricao):
-    """Destaca a regra de pedido mínimo sem perder o volume do produto."""
     texto = str(descricao).strip() if pd.notna(descricao) else ""
     partes = re.split(r"(?i)(pedido\s*m[ií]nimo\s*:?.*)", texto, maxsplit=1)
     descricao_html = escape(partes[0].strip())
@@ -427,7 +437,7 @@ def adicionar_ao_carrinho(nome, preco):
         st.session_state.carrinho[nome]["qtd"] += 1
     else:
         st.session_state.carrinho[nome] = {"preco": preco, "qtd": 1}
-    st.toast(f"{nome} adicionado ao pedido!", icon="✅")
+    st.toast(f"✅ {nome} adicionado! Clique na seta '>>' no topo superior para ver seu pedido.", icon="🛒")
 
 
 def remover_do_carrinho(nome):
@@ -447,6 +457,8 @@ def set_categoria(categoria):
     st.session_state.categoria_selecionada = categoria
 
 
+# ---------------- BARRA LATERAL (CARRINHO) ---------------- #
+
 with st.sidebar:
     total_itens = sum(item["qtd"] for item in st.session_state.carrinho.values())
     st.title(f"🛒 Seu Pedido ({total_itens} itens)")
@@ -455,36 +467,41 @@ with st.sidebar:
         st.info("Seu carrinho está vazio. Adicione produtos do catálogo!")
     else:
         df_catalogo = carregar_dados()
-        
-        st.markdown("<p style='color:#e9b83f; font-weight:700; margin-bottom:5px; font-size:1.1rem;'>Resumo do Pedido</p>", unsafe_allow_html=True)
-        
+
+        st.markdown(
+            "<p style='color:#e9b83f; font-weight:700; margin-bottom:5px; font-size:1.1rem;'>Resumo do Pedido</p>",
+            unsafe_allow_html=True)
+
         total_subitens = 0
 
         for item, dados in list(st.session_state.carrinho.items()):
             subtotal = dados["qtd"] * dados["preco"]
             total_subitens += subtotal
-            
+
             st.markdown("<hr style='margin: 0.5rem 0; border-color: rgba(255,255,255,0.08);'>", unsafe_allow_html=True)
-            
+
             linha_produto = df_catalogo[df_catalogo["Produto"] == item]
             link_foto = linha_produto["Foto"].iloc[0] if not linha_produto.empty else None
 
             col_img, col_info = st.columns([1.2, 3.8], gap="small")
-            
+
             with col_img:
                 if pd.notna(link_foto) and str(link_foto).strip():
                     st.image(preparar_imagem_produto(str(link_foto)), use_container_width=True)
                 else:
                     imagem_vazia = Image.new("RGB", (700, 560), (248, 251, 254))
                     st.image(imagem_vazia, use_container_width=True)
-                    
+
             with col_info:
                 c_nome, c_tag_sub = st.columns([2.5, 1.5])
                 with c_nome:
-                    st.markdown(f"<div style='font-size:0.95rem; font-weight:700; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;'>{item}</div>", unsafe_allow_html=True)
+                    st.markdown(
+                        f"<div style='font-size:0.95rem; font-weight:700; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;'>{item}</div>",
+                        unsafe_allow_html=True)
                 with c_tag_sub:
-                    st.markdown("<div style='font-size:0.8rem; color:#9dbbd4; text-align:right;'>Subtotal</div>", unsafe_allow_html=True)
-                
+                    st.markdown("<div style='font-size:0.8rem; color:#9dbbd4; text-align:right;'>Subtotal</div>",
+                                unsafe_allow_html=True)
+
                 c_menos, c_qtd, c_mais, c_sub = st.columns([0.8, 0.8, 0.8, 2.5])
                 with c_menos:
                     st.button("−", key=f"rem_{item}", on_click=remover_do_carrinho, args=(item,))
@@ -493,20 +510,20 @@ with st.sidebar:
                 with c_mais:
                     st.button("＋", key=f"add_{item}", on_click=adicionar_ao_carrinho, args=(item, dados["preco"]))
                 with c_sub:
-                    st.markdown(f"<div class='subtotal-valor'>R$ {formatar_preco(subtotal)}</div>", unsafe_allow_html=True)
-            
-        st.markdown("<hr style='margin: 0.5rem 0 1.5rem 0; border-color: rgba(255,255,255,0.08);'>", unsafe_allow_html=True)
-        
-        # --- LÓGICA DE ENTREGA ---
+                    st.markdown(f"<div class='subtotal-valor'>R$ {formatar_preco(subtotal)}</div>",
+                                unsafe_allow_html=True)
+
+        st.markdown("<hr style='margin: 0.5rem 0 1.5rem 0; border-color: rgba(255,255,255,0.08);'>",
+                    unsafe_allow_html=True)
+
         st.markdown("### Informações de Entrega")
         st.info("Consulte o mapa abaixo para verificar a taxa de entrega da sua região.")
-        
+
         endereco_cliente = st.text_input(
-            "Endereço de entrega (Obrigatório):", 
+            "Endereço de entrega (Obrigatório):",
             placeholder="Ex: Rua das Flores, 123 - Centro"
         )
-        
-        # Exibição do mapa de zonas com verificação dinâmica
+
         if CAMINHO_MAPA and CAMINHO_MAPA.exists():
             st.image(str(CAMINHO_MAPA), caption="Zonas de Entrega e Taxas")
         else:
@@ -518,20 +535,19 @@ with st.sidebar:
                 </div>
                 """, unsafe_allow_html=True
             )
-        
-        # --- CÁLCULO E EXIBIÇÃO DO TOTAL ---
+
         st.divider()
         st.markdown(f"### Total: R$ {formatar_preco(total_subitens)} + Taxa de Entrega")
-            
-        st.caption("⚠️ Pedido mínimo varia conforme a região.")
-        st.caption("Por enquanto, aceitamos pagamentos via Pix ou no ato da entrega. Em breve, também disponibilizaremos pagamentos com cartão de crédito e débito para oferecer ainda mais comodidade.")
 
-        # --- GERAÇÃO DO PEDIDO WHATSAPP ---
+        st.caption("⚠️ Pedido mínimo varia conforme a região.")
+        st.caption(
+            "Por enquanto, aceitamos pagamentos via Pix ou no ato da entrega. Em breve, também disponibilizaremos pagamentos com cartão de crédito e débito para oferecer ainda mais comodidade.")
+
         resumo_whatsapp = "Olá! Gostaria de fazer o seguinte pedido:\n\n"
-        
+
         for item, dados in list(st.session_state.carrinho.items()):
             resumo_whatsapp += f"• {dados['qtd']}x {item} (R$ {formatar_preco(dados['preco'])})\n"
-            
+
         resumo_whatsapp += f"\n*Subtotal dos itens:* R$ {formatar_preco(total_subitens)}"
         resumo_whatsapp += f"\n*Endereço:* {endereco_cliente if endereco_cliente else 'Não informado'}"
         resumo_whatsapp += "\n*Taxa de entrega:* A combinar (conforme mapa de zonas)"
@@ -547,11 +563,23 @@ with st.sidebar:
                 </div>
             </a>
         """, unsafe_allow_html=True)
-        
+
         st.button("🗑️ Limpar Carrinho", on_click=esvaziar_carrinho, use_container_width=True)
 
-
 # ---------------- CABEÇALHO ---------------- #
+
+# Indicador em destaque no topo para telemóveis informando sobre o carrinho
+total_itens_atual = sum(item["qtd"] for item in st.session_state.carrinho.values())
+if total_itens_atual > 0:
+    st.markdown(
+        f"""
+        <div class="alerta-carrinho-mobile">
+            🛒 <b>Seu Pedido tem {total_itens_atual} item(ns)!</b><br>
+            <span style="font-size:0.85rem; font-weight:normal;">Clique na seta <b>'>>'</b> no canto superior esquerdo para ver o carrinho e finalizar.</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 col_logo, col_texto = st.columns([1.1, 5])
 
@@ -578,7 +606,6 @@ with col_texto:
         """,
         unsafe_allow_html=True,
     )
-
 
 # ---------------- BUSCA, CATEGORIAS E CATÁLOGO ---------------- #
 
@@ -618,12 +645,12 @@ else:
         df_filtrado = df_filtrado[
             df_filtrado["Produto"].str.contains(termo_busca, case=False, na=False)
             | df_filtrado["Descrição"].astype(str).str.contains(termo_busca, case=False, na=False)
-        ]
+            ]
 
     if st.session_state.categoria_selecionada != "TODOS OS PRODUTOS":
         df_filtrado = df_filtrado[
             df_filtrado["Categoria"] == st.session_state.categoria_selecionada
-        ]
+            ]
 
     st.markdown("<br>", unsafe_allow_html=True)
 
