@@ -1,546 +1,466 @@
 import streamlit as st
-import pandas as pd
-import urllib.parse
-import requests
-from html import escape
+import os
 import re
-
-from io import BytesIO
+import csv
+import io
+import requests
+from urllib.parse import quote
 from pathlib import Path
-from PIL import Image, ImageChops
 
-# ---------------- CONFIGURAÇÕES ---------------- #
+# ================== CONFIGURAÇÕES GERAIS ==================
+NUMERO_WHATSAPP = "553484012444"
+LOGO_PATH = "assets/logo.png"
+IMAGEM_FALLBACK = "https://placehold.co/300x300/f0f0f0/999999?text=Sem+Imagem"
 
-st.set_page_config(
-    page_title="Patovaldo | Distribuidora de Bebidas e Guloseimas",
-    page_icon="🦆",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
-
-NUMERO_WHATSAPP = "+553484012444"
-SHEET_URL = (
-    "https://docs.google.com/spreadsheets/d/"
-    "1AhD1Mw0PyZ5mvZouEKkofhHovP4d4biOnXQhgLkJOWQ/"
-    "export?format=csv&gid=0"
-)
-
-# Caminhos de arquivos usando busca dinâmica
-PASTA_PROJETO = Path(__file__).resolve().parent
+# Busca dinâmica de assets (Mapa de entregas / Zonas)
+PASTA_PROJETO = Path(__file__).resolve().parent if '__file__' in globals() else Path.cwd()
 PASTA_ASSETS = PASTA_PROJETO / "assets"
 
 
 def buscar_imagem(nome_base: str) -> Path | None:
-    """Procura um arquivo na pasta 'assets' testando várias extensões."""
     if not PASTA_ASSETS.exists():
         return None
-
     extensoes = [".png", ".jpg", ".jpeg", ".webp", ".PNG", ".JPG", ".JPEG"]
     for ext in extensoes:
         caminho_teste = PASTA_ASSETS / f"{nome_base}{ext}"
         if caminho_teste.exists():
             return caminho_teste
-
     for arquivo in PASTA_ASSETS.iterdir():
         if arquivo.stem.lower() == nome_base.lower():
             return arquivo
-
     return None
 
 
-CAMINHO_LOGO = buscar_imagem("logo")
 CAMINHO_MAPA = buscar_imagem("mapa_zonas")
-CAMINHO_CARRINHO = buscar_imagem("carrinho")
 
-if "carrinho" not in st.session_state:
-    st.session_state.carrinho = {}
+# --- Catálogo (Google Sheets) ---
+GOOGLE_SHEET_ID = "1AhD1Mw0PyZ5mvZouEKkofhHovP4d4biOnXQhgLkJOWQ"
+GOOGLE_SHEET_GID = "0"
+GOOGLE_SHEET_CSV_URL = (
+    f"https://docs.google.com/spreadsheets/d/{GOOGLE_SHEET_ID}/export?format=csv&gid={GOOGLE_SHEET_GID}"
+)
+CSV_LOCAL_FALLBACK = "produtos.csv"
+ORDEM_CATEGORIAS_PREFERIDA = ["Bebidas", "Guloseimas", "Diversos"]
 
-if "categoria_selecionada" not in st.session_state:
-    st.session_state.categoria_selecionada = "TODOS OS PRODUTOS"
+st.set_page_config(
+    page_title=" Patovaldo Distribuidora",
+    page_icon="📦",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-# ---------------- ESTILO CSS SEGURO E ESTÁVEL ---------------- #
-
-st.markdown(
-    """
+# --- CSS CUSTOMIZADO UNIFICADO ---
+custom_css = """
 <style>
     :root {
-        --azul: #183b5e;
-        --azul-escuro: #10253c;
-        --azul-claro: #eaf2f8;
-        --borda: #d5e5f1;
-        --dourado: #e9b83f;
+        --azul: #183B5E;
+        --azul-escuro: #10253C;
+        --dourado: #E9B83F;
         --verde-whatsapp: #25D366;
     }
 
-    .stApp {
-        background-color: #f7f9fb;
-        color: var(--azul);
-    }
+    footer {visibility: hidden;}
+    [data-testid="stAppDeployButton"] {display: none;}
 
     .block-container {
-        max-width: 1400px;
         padding-top: 2rem !important;
-        padding-bottom: 2rem;
+        padding-bottom: 2rem !important;
     }
 
-    header[data-testid="stHeader"] {
-        background-color: #101319 !important;
-    }
-
-    /* Destaque discreto do botão do carrinho no topo */
-    button[data-testid="stHeaderNavStateButton"],
-    button[data-testid="stSidebarCollapseButton"] {
-        background-color: var(--azul) !important;
-        border: 2px solid var(--dourado) !important;
-        color: #ffffff !important;
-        border-radius: 8px !important;
-    }
-
-    .marca {
-        color: var(--azul);
-        font-size: 1.6rem;
-        font-weight: 850;
-        line-height: 1.15;
-        margin: 0;
-    }
-
-    .apresentacao-catalogo {
-        color: #475569;
-        font-size: 0.9rem;
-        line-height: 1.4;
-        margin-top: 0.3rem;
-        max-width: 760px;
-    }
-
-    /* Campo de Busca (Garante texto escuro e bem visível) */
-    div[data-testid="stTextInput"] input {
-        background-color: #ffffff !important;
-        color: #183b5e !important;
-        font-weight: 600 !important;
-        border: 2px solid #183b5e !important;
-        border-radius: 8px !important;
-    }
-
-    div[data-testid="stTextInput"] input::placeholder {
-        color: #64748b !important;
-        opacity: 1 !important;
-    }
-
-    /* Cards de Produtos */
-    div[data-testid="stVerticalBlockBorderWrapper"] {
-        background: #ffffff;
-        border: 1px solid #e1e7ed !important;
-        border-radius: 14px;
-        box-shadow: 0 3px 10px rgba(15, 44, 71, 0.08);
-        height: 100%;
-        padding: 0.75rem;
-    }
-
-    .produto-titulo {
-        color: var(--azul);
-        font-size: 1rem;
-        font-weight: 800;
-        line-height: 1.2;
-        margin: 0.4rem 0 0.2rem;
-        text-align: center;
-    }
-
-    .produto-desc {
-        color: #64748b;
-        font-size: 0.8rem;
-        font-weight: 600;
-        line-height: 1.3;
-        text-align: center;
-    }
-
-    .produto-regra-minima {
-        color: #1B44BF;
-        font-size: 0.8rem;
-        font-weight: 700;
-        line-height: 1.3;
-        margin-top: 0.1rem;
-        text-align: center;
-    }
-
-    .produto-preco {
-        color: var(--azul);
-        font-size: 1.45rem;
-        font-weight: 900;
-        margin: 0.4rem 0 0.5rem;
-        text-align: center;
-    }
-
-    /* Estilo da Barra Lateral (Carrinho) */
+    /* Estilo da Barra Lateral (Carrinho Escuro do 2º Código) */
     section[data-testid="stSidebar"] {
         background-color: var(--azul-escuro) !important;
     }
 
+    .header-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #183B5E;
+        margin-bottom: 0.2rem;
+    }
+    .header-sub {
+        font-size: 1rem;
+        color: #4A5568;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+
+    /* Barra de Pesquisa */
+    div[data-baseweb="input"] {
+        border: 1px solid #CBD5E0 !important;
+        box-shadow: none !important;
+    }
+    div[data-baseweb="input"]:focus-within {
+        border: 1px solid #183B5E !important;
+    }
+
+    /* Botões de Categoria */
+    div[data-testid="stHorizontalBlock"] button[kind="secondary"],
+    div[data-testid="stHorizontalBlock"] button {
+        background-color: #FFFFFF !important;
+        color: #183B5E !important;
+        border: 1px solid #183B5E !important;
+        font-weight: 600 !important;
+        border-radius: 8px !important;
+    }
+    div[data-testid="stHorizontalBlock"] button[kind="primary"] {
+        background-color: #183B5E !important;
+        color: #FFFFFF !important;
+        border: 1px solid #183B5E !important;
+    }
+
+    /* Cards de Produtos */
+    .product-card {
+        background-color: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 10px;
+        padding: 12px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+    .product-img {
+        width: 100%;
+        height: 160px;
+        object-fit: contain;
+        margin-bottom: 8px;
+        background: #FAFAFA;
+        border-radius: 6px;
+    }
+    .product-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #2D3748;
+        margin: 2px 0 !important;
+        min-height: 2.8em;
+        line-height: 1.2;
+    }
+    .product-info {
+        font-size: 0.8rem;
+        color: #718096;
+        margin: 1px 0 !important;
+    }
+    .min-order {
+        color: #1B44BF !important;
+        font-weight: 700;
+        font-size: 0.8rem;
+        margin: 2px 0 !important;
+    }
+    .product-price {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #1A202C;
+        margin: 4px 0 !important;
+    }
+
+    /* Botão 'Adicionar' Verde */
+    div[class*="st-key-add_"] button[kind="secondary"],
+    div[class*="st-key-add_"] button {
+        background-color: #28A745 !important;
+        color: #FFFFFF !important;
+        border: none !important;
+        border-radius: 6px !important;
+        font-weight: bold !important;
+        width: 100%;
+    }
+    div[class*="st-key-add_"] button:hover {
+        background-color: #218838 !important;
+        color: #FFFFFF !important;
+    }
+
+    /* Itens no Carrinho (Adaptação para o tema escuro da Sidebar) */
+    .cart-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+        padding-bottom: 8px;
+    }
+    .cart-img {
+        width: 42px;
+        height: 42px;
+        object-fit: contain;
+        border-radius: 4px;
+        background: #fff;
+    }
     .item-carrinho-titulo {
         color: #ffffff;
         font-weight: 700;
-        font-size: 0.95rem;
-        margin-bottom: 4px;
-    }
-
-    .item-carrinho-subtotal {
-        color: #e9b83f;
-        font-weight: 700;
         font-size: 0.9rem;
     }
-
-    .rodape {
-        color: #64748b;
+    .item-carrinho-subtotal {
+        color: var(--dourado);
+        font-weight: 700;
         font-size: 0.85rem;
-        margin-top: 2.5rem;
-        text-align: center;
     }
 </style>
-""",
-    unsafe_allow_html=True,
+"""
+st.markdown(custom_css, unsafe_allow_html=True)
+
+# --- INICIALIZAÇÃO DO ESTADO DA SESSÃO ---
+if 'carrinho' not in st.session_state:
+    st.session_state.carrinho = {}
+if 'categoria_ativa' not in st.session_state:
+    st.session_state.categoria_ativa = "Todos"
+
+
+# ================== CARREGAMENTO DO CATÁLOGO ==================
+def gerar_id(categoria, nome):
+    base = f"{categoria}_{nome}".lower()
+    return re.sub(r"[^a-z0-9]+", "_", base).strip("_")
+
+
+def parse_preco(valor):
+    texto = str(valor).strip()
+    if "," in texto:
+        texto = texto.replace(".", "").replace(",", ".")
+    try:
+        return float(texto)
+    except ValueError:
+        return 0.0
+
+
+def parse_descricao(descricao):
+    partes = [p.strip() for p in str(descricao).split("|")]
+    medida = partes[0] if partes and partes[0] else ""
+    minimo = partes[1] if len(partes) > 1 else ""
+    return medida, minimo
+
+
+def linhas_para_produtos(csv_texto):
+    produtos_lidos = []
+    leitor = csv.DictReader(io.StringIO(csv_texto))
+    for linha in leitor:
+        nome = (linha.get("produto") or "").strip()
+        if not nome:
+            continue
+        categoria = (linha.get("categoria") or "").strip().title()
+        medida, minimo = parse_descricao(linha.get("descricao", ""))
+        produtos_lidos.append({
+            "id": gerar_id(categoria, nome),
+            "nome": nome,
+            "medida": medida,
+            "minimo": minimo,
+            "preco": parse_preco(linha.get("preco", "0")),
+            "categoria": categoria,
+            "imagem": (linha.get("foto") or "").strip() or IMAGEM_FALLBACK,
+        })
+    return produtos_lidos
+
+
+@st.cache_data(ttl=300, show_spinner="Carregando catálogo de produtos...")
+def carregar_produtos():
+    try:
+        resposta = requests.get(GOOGLE_SHEET_CSV_URL, timeout=10)
+        resposta.raise_for_status()
+        lidos = linhas_para_produtos(resposta.content.decode("utf-8"))
+        if lidos:
+            return lidos, "online"
+    except Exception:
+        pass
+
+    if os.path.exists(CSV_LOCAL_FALLBACK):
+        try:
+            with open(CSV_LOCAL_FALLBACK, encoding="utf-8") as f:
+                lidos = linhas_para_produtos(f.read())
+            if lidos:
+                return lidos, "local"
+        except Exception:
+            pass
+
+    return [{
+        "id": "exemplo_1", "nome": "PRODUTO DE EXEMPLO", "medida": "1 UN.",
+        "minimo": "", "preco": 9.90, "categoria": "Diversos", "imagem": IMAGEM_FALLBACK
+    }], "exemplo"
+
+
+produtos, fonte_catalogo = carregar_produtos()
+
+
+# --- FUNÇÕES DE AUXÍLIO E RENDERIZAÇÃO ---
+def render_product_card(p):
+    min_html = f'<div class="min-order">{p["minimo"]}</div>' if p["minimo"] else ""
+    card_html = (
+        f'<div class="product-card">'
+        f'<img src="{p["imagem"]}" class="product-img" '
+        f'onerror="this.onerror=null;this.src=\'{IMAGEM_FALLBACK}\';">'
+        f'<div class="product-title">{p["nome"]}</div>'
+        f'<div class="product-info">{p["medida"]}</div>'
+        f'{min_html}'
+        f'<div class="product-price">R$ {p["preco"]:.2f}</div>'
+        f'</div>'
+    )
+    st.markdown(card_html, unsafe_allow_html=True)
+
+
+def render_cart_item(item):
+    subtotal = item["preco"] * item["qtd"]
+    item_html = (
+        f'<div class="cart-item">'
+        f'<img src="{item["imagem"]}" class="cart-img" '
+        f'onerror="this.onerror=null;this.src=\'{IMAGEM_FALLBACK}\';">'
+        f'<div>'
+        f'<div class="item-carrinho-titulo">{item["nome"]}</div>'
+        f'<div class="item-carrinho-subtotal">R$ {item["preco"]:.2f} x {item["qtd"]} = R$ {subtotal:.2f}</div>'
+        f'</div>'
+        f'</div>'
+    )
+    st.markdown(item_html, unsafe_allow_html=True)
+
+
+# --- CABEÇALHO DA PÁGINA ---
+col_logo, col_header = st.columns([1, 4])
+with col_logo:
+    if os.path.exists(LOGO_PATH):
+        st.image(LOGO_PATH, width=130)
+    else:
+        st.markdown("### 📦")
+
+with col_header:
+    st.markdown('<div class="header-title">PATOVALDO DISTRIBUIDORA</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="header-sub">'
+        '📦 Bebidas e alimentos para estabelecimentos e festas<br>'
+        '🚚 Entrega rápida em Patos de Minas e região<br>'
+        '👇 Confira nosso catálogo e faça seu pedido!'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+with st.expander("⚙️ Opções do catálogo"):
+    origem_txt = {"online": "Google Sheets (online)", "local": "Arquivo local produtos.csv",
+                  "exemplo": "Produto de exemplo"}[fonte_catalogo]
+    st.caption(f"Fonte atual dos produtos: **{origem_txt}** · {len(produtos)} produto(s) carregado(s)")
+    if st.button("🔄 Atualizar catálogo agora"):
+        st.cache_data.clear()
+        st.rerun()
+
+# --- BARRA DE PESQUISA & FILTROS ---
+busca = st.text_input("", placeholder="🔍 Ex: Cachaça 51, Chiclete...", label_visibility="collapsed")
+
+categorias_no_catalogo = sorted({p["categoria"] for p in produtos})
+categorias = (
+        ["Todos"]
+        + [c for c in ORDEM_CATEGORIAS_PREFERIDA if c in categorias_no_catalogo]
+        + [c for c in categorias_no_catalogo if c not in ORDEM_CATEGORIAS_PREFERIDA]
 )
 
+cols_cat = st.columns(len(categorias))
+for col, cat in zip(cols_cat, categorias):
+    with col:
+        btn_type = "primary" if st.session_state.categoria_ativa == cat else "secondary"
+        if st.button(cat, use_container_width=True, type=btn_type, key=f"cat_{cat}"):
+            st.session_state.categoria_ativa = cat
+            st.rerun()
 
-# ---------------- FUNÇÕES ---------------- #
+# --- FILTRAGEM E GRADE DE PRODUTOS ---
+prod_filtrados = [
+    p for p in produtos
+    if (st.session_state.categoria_ativa == "Todos" or p["categoria"] == st.session_state.categoria_ativa)
+       and (busca.lower() in p["nome"].lower())
+]
 
-@st.cache_data
-def carregar_logo(caminho):
-    logo = Image.open(caminho).convert("RGBA")
-    margem = 18
-    logo_com_margem = Image.new(
-        "RGBA",
-        (logo.width + margem * 2, logo.height + margem * 2),
-        (255, 255, 255, 0),
-    )
-    logo_com_margem.alpha_composite(logo, (margem, margem))
-    return logo_com_margem
+if not prod_filtrados:
+    st.info("Nenhum produto encontrado para essa busca/categoria.")
+else:
+    cols = st.columns(4)
+    for idx, p in enumerate(prod_filtrados):
+        with cols[idx % 4]:
+            render_product_card(p)
 
+            if st.button("Adicionar", key=f"add_{p['id']}", use_container_width=True):
+                if p['id'] in st.session_state.carrinho:
+                    st.session_state.carrinho[p['id']]['qtd'] += 1
+                else:
+                    st.session_state.carrinho[p['id']] = {
+                        "nome": p['nome'],
+                        "preco": p['preco'],
+                        "imagem": p['imagem'],
+                        "qtd": 1
+                    }
+                st.toast(f"✅ {p['nome']} adicionado ao carrinho!", icon="🛒")
+                st.rerun()
 
-def corrigir_link_imagem(link):
-    link = str(link).strip()
-    if "drive.google.com/file/d/" in link:
-        arquivo_id = link.split("/d/")[1].split("/")[0]
-        return f"https://drive.google.com/uc?export=view&id={arquivo_id}"
-    if "drive.google.com/open?id=" in link:
-        arquivo_id = link.split("id=")[1].split("&")[0]
-        return f"https://drive.google.com/uc?export=view&id={arquivo_id}"
-    return link
-
-
-@st.cache_data(ttl=3600)
-def preparar_imagem_produto(link):
-    largura, altura = 700, 560
-    fundo = (248, 251, 254, 255)
-
-    try:
-        resposta = requests.get(corrigir_link_imagem(link), timeout=15)
-        resposta.raise_for_status()
-
-        imagem_original = Image.open(BytesIO(resposta.content)).convert("RGBA")
-
-        base_branca = Image.new("RGBA", imagem_original.size, (255, 255, 255, 255))
-        imagem_visivel = Image.alpha_composite(base_branca, imagem_original)
-        diferenca = ImageChops.difference(
-            imagem_visivel.convert("RGB"),
-            Image.new("RGB", imagem_original.size, "white"),
-        )
-        limites = diferenca.getbbox()
-        imagem_recortada = imagem_original.crop(limites) if limites else imagem_original
-
-        quadro = Image.new("RGBA", (largura, altura), fundo)
-        imagem_recortada.thumbnail((600, 480), Image.Resampling.LANCZOS)
-
-        posicao_x = (largura - imagem_recortada.width) // 2
-        posicao_y = (altura - imagem_recortada.height) // 2
-        quadro.alpha_composite(imagem_recortada, (posicao_x, posicao_y))
-
-        return quadro.convert("RGB")
-
-    except Exception:
-        return Image.new("RGB", (largura, altura), fundo[:3])
-
-
-@st.cache_data(ttl=300)
-def carregar_dados():
-    try:
-        df = pd.read_csv(SHEET_URL)
-        df.columns = df.columns.str.strip().str.lower()
-
-        df = df.rename(
-            columns={
-                "categoria": "Categoria",
-                "produto": "Produto",
-                "preco": "Preço",
-                "preço": "Preço",
-                "descricao": "Descrição",
-                "descrição": "Descrição",
-                "foto": "Foto",
-            }
-        )
-
-        if "Categoria" not in df.columns:
-            df["Categoria"] = "DIVERSOS"
-
-        df["Categoria"] = (
-            df["Categoria"].fillna("DIVERSOS").astype(str).str.strip().str.upper()
-        )
-
-        if "Preço" in df.columns:
-            texto_preco = (
-                df["Preço"]
-                .astype(str)
-                .str.replace("R$", "", regex=False)
-                .str.strip()
-            )
-            texto_preco = texto_preco.str.replace(",", ".", regex=False)
-            df["Preço"] = pd.to_numeric(texto_preco, errors="coerce")
-
-        return df.dropna(subset=["Produto"])
-
-    except Exception as erro:
-        st.error(f"Não foi possível carregar a planilha: {erro}")
-        return pd.DataFrame()
-
-
-def formatar_preco(preco):
-    return f"{preco:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-
-
-def formatar_descricao_produto(descricao):
-    texto = str(descricao).strip() if pd.notna(descricao) else ""
-    partes = re.split(r"(?i)(pedido\s*m[ií]nimo\s*:?.*)", texto, maxsplit=1)
-    descricao_html = escape(partes[0].strip())
-    regra_html = escape(partes[1].strip()) if len(partes) > 1 else ""
-    return descricao_html, regra_html
-
-
-# ---------------- CARRINHO ---------------- #
-
-def adicionar_ao_carrinho(nome, preco):
-    if pd.isna(preco):
-        preco = 0.0
-    if nome in st.session_state.carrinho:
-        st.session_state.carrinho[nome]["qtd"] += 1
-    else:
-        st.session_state.carrinho[nome] = {"preco": preco, "qtd": 1}
-    st.toast(f"✅ {nome} adicionado ao carrinho!", icon="🛒")
-
-
-def remover_do_carrinho(nome):
-    if nome not in st.session_state.carrinho:
-        return
-    if st.session_state.carrinho[nome]["qtd"] > 1:
-        st.session_state.carrinho[nome]["qtd"] -= 1
-    else:
-        del st.session_state.carrinho[nome]
-
-
-def esvaziar_carrinho():
-    st.session_state.carrinho = {}
-
-
-def set_categoria(categoria):
-    st.session_state.categoria_selecionada = categoria
-
-
-# ---------------- BARRA LATERAL (CARRINHO ESTÁVEL) ---------------- #
-
+# ================== BARRA LATERAL (NOVO CARRINHO HÍBRIDO) ==================
 with st.sidebar:
     total_itens = sum(item["qtd"] for item in st.session_state.carrinho.values())
-
     st.markdown(f"<h2 style='color:#ffffff; margin-bottom:10px;'>🛒 Seu Pedido ({total_itens})</h2>",
                 unsafe_allow_html=True)
 
     if not st.session_state.carrinho:
         st.info("Seu carrinho está vazio. Adicione produtos do catálogo!")
     else:
-        df_catalogo = carregar_dados()
-        total_subitens = 0
+        total_subitens = 0.0
+        linhas_whatsapp = []
 
-        for item, dados in list(st.session_state.carrinho.items()):
-            subtotal = dados["qtd"] * dados["preco"]
+        for item_id, item in list(st.session_state.carrinho.items()):
+            subtotal = item['preco'] * item['qtd']
             total_subitens += subtotal
+            linhas_whatsapp.append(f"• {item['qtd']}x {item['nome']} (R$ {subtotal:.2f})")
 
-            st.markdown("<hr style='margin: 0.5rem 0; border-color: rgba(255,255,255,0.1);'>", unsafe_allow_html=True)
-            st.markdown(f"<div class='item-carrinho-titulo'>{item}</div>", unsafe_allow_html=True)
+            # Linha divisória fina
+            st.markdown("<hr style='margin: 0.5rem 0; border-color: rgba(255,255,255,0.15);'>", unsafe_allow_html=True)
 
-            # Layout limpo para botões do carrinho
-            col_botoes, col_subtotal = st.columns([2, 2])
+            # Card do item com foto
+            render_cart_item(item)
 
-            with col_botoes:
-                btn_rem, txt_qtd, btn_add = st.columns([1, 1, 1])
-                with btn_rem:
-                    st.button("−", key=f"rem_{item}", on_click=remover_do_carrinho, args=(item,))
-                with txt_qtd:
-                    st.markdown(
-                        f"<div style='text-align:center; color:#ffffff; font-weight:bold; margin-top:4px;'>{dados['qtd']}</div>",
-                        unsafe_allow_html=True)
-                with btn_add:
-                    st.button("＋", key=f"add_{item}", on_click=adicionar_ao_carrinho, args=(item, dados["preco"]))
+            # Controles de Quantidade
+            c1, c2, c3 = st.columns([1, 1, 2])
+            if c1.button("−", key=f"dec_{item_id}"):
+                if item['qtd'] > 1:
+                    item['qtd'] -= 1
+                else:
+                    del st.session_state.carrinho[item_id]
+                st.rerun()
 
-            with col_subtotal:
-                st.markdown(
-                    f"<div class='item-carrinho-subtotal' style='text-align:right; margin-top:4px;'>R$ {formatar_preco(subtotal)}</div>",
+            c2.markdown(
+                f"<div style='text-align:center; color:#ffffff; font-weight:bold; padding-top:4px;'>{item['qtd']}</div>",
+                unsafe_allow_html=True)
+
+            if c3.button("＋", key=f"inc_{item_id}"):
+                item['qtd'] += 1
+                st.rerun()
+
+        st.markdown("<hr style='margin: 1rem 0; border-color: rgba(255,255,255,0.2);'>", unsafe_allow_html=True)
+
+        # Informações adicionais de entrega (Lógica do 2º Código)
+        st.markdown("<h4 style='color:#ffffff; margin-bottom: 5px;'>Informações de Entrega</h4>",
                     unsafe_allow_html=True)
-
-        st.markdown("<hr style='margin: 1rem 0; border-color: rgba(255,255,255,0.1);'>", unsafe_allow_html=True)
-
-        st.markdown("<h4 style='color:#ffffff;'>Informações de Entrega</h4>", unsafe_allow_html=True)
         endereco_cliente = st.text_input(
             "Endereço de entrega (Obrigatório):",
-            placeholder="Ex: Rua das Flores, 123"
+            placeholder="Ex: Rua das Flores, 123",
+            label_visibility="collapsed"
         )
 
         if CAMINHO_MAPA and CAMINHO_MAPA.exists():
             st.image(str(CAMINHO_MAPA), caption="Zonas de Entrega e Taxas")
 
-        st.divider()
-        st.markdown(f"<h3 style='color:#ffffff;'>Total: R$ {formatar_preco(total_subitens)} + Taxa</h3>",
+        st.markdown(f"<h3 style='color:#ffffff; margin-top:15px;'>Total: R$ {total_subitens:.2f} + Taxa</h3>",
                     unsafe_allow_html=True)
 
+        # Construção da Mensagem Formatada
         resumo_whatsapp = "Olá! Gostaria de fazer o seguinte pedido:\n\n"
-        for item, dados in list(st.session_state.carrinho.items()):
-            resumo_whatsapp += f"• {dados['qtd']}x {item} (R$ {formatar_preco(dados['preco'])})\n"
-
-        resumo_whatsapp += f"\n*Subtotal dos itens:* R$ {formatar_preco(total_subitens)}"
+        resumo_whatsapp += "\n".join(linhas_whatsapp)
+        resumo_whatsapp += f"\n\n*Subtotal dos itens:* R$ {total_subitens:.2f}"
         resumo_whatsapp += f"\n*Endereço:* {endereco_cliente if endereco_cliente else 'Não informado'}"
         resumo_whatsapp += "\n\nAguardo confirmação da disponibilidade!"
 
-        link_whatsapp = f"https://wa.me/{NUMERO_WHATSAPP}?text={urllib.parse.quote(resumo_whatsapp)}"
+        link_whatsapp = f"https://wa.me/{NUMERO_WHATSAPP}?text={quote(resumo_whatsapp)}"
 
+        st.markdown('<div style="height:10px;"></div>', unsafe_allow_html=True)
+
+        # Botão de WhatsApp estilo "Card" Verde
         st.markdown(f"""
             <a href="{link_whatsapp}" target="_blank" style="text-decoration:none;">
-                <div style="background-color:#25D366; color:white; padding:12px; text-align:center; border-radius:8px; font-weight:800; font-size:1rem; margin-top:10px;">
+                <div style="background-color:#25D366; color:white; padding:12px; text-align:center; border-radius:8px; font-weight:800; font-size:1rem; margin-bottom:12px;">
                     ✅ Finalizar Pedido no WhatsApp
                 </div>
             </a>
         """, unsafe_allow_html=True)
 
-        st.button("🗑️ Limpar Carrinho", on_click=esvaziar_carrinho, use_container_width=True)
-
-# ---------------- CABEÇALHO ---------------- #
-
-col_logo, col_texto = st.columns([1.1, 5])
-
-with col_logo:
-    if CAMINHO_LOGO and CAMINHO_LOGO.exists():
-        st.image(carregar_logo(str(CAMINHO_LOGO)), width=140)
-
-with col_texto:
-    st.markdown('<p class="marca">PATOVALDO DISTRIBUIDORA</p>', unsafe_allow_html=True)
-    st.markdown(
-        """
-        <div class="apresentacao-catalogo">
-            &#128230; Bebidas e Alimentos | &#128666; Entrega rápida em Patos de Minas e região
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-# ---------------- BUSCA, CATEGORIAS E CATÁLOGO ---------------- #
-
-df = carregar_dados()
-
-if df.empty:
-    st.warning("Nenhum produto encontrado. Verifique sua planilha.")
-else:
-    termo_busca = st.text_input(
-        "Buscar produto",
-        placeholder="🔍 Ex: Cachaça 51, Chiclete...",
-        label_visibility="collapsed",
-    )
-
-    categorias_botoes = {
-        "TODOS OS PRODUTOS": "🛒 Todos",
-        "BEBIDAS": "🥤 Bebidas",
-        "GULOSEIMAS": "🍬 Guloseimas",
-        "DIVERSOS": "📦 Diversos",
-    }
-
-    colunas_botoes = st.columns(len(categorias_botoes))
-    for indice, (chave, rotulo) in enumerate(categorias_botoes.items()):
-        with colunas_botoes[indice]:
-            ativo = st.session_state.categoria_selecionada == chave
-            st.button(
-                rotulo,
-                key=f"categoria_{chave}",
-                type="primary" if ativo else "secondary",
-                use_container_width=True,
-                on_click=set_categoria,
-                args=(chave,),
-            )
-
-    df_filtrado = df.copy()
-    if termo_busca:
-        df_filtrado = df_filtrado[
-            df_filtrado["Produto"].str.contains(termo_busca, case=False, na=False)
-            | df_filtrado["Descrição"].astype(str).str.contains(termo_busca, case=False, na=False)
-            ]
-
-    if st.session_state.categoria_selecionada != "TODOS OS PRODUTOS":
-        df_filtrado = df_filtrado[
-            df_filtrado["Categoria"] == st.session_state.categoria_selecionada
-            ]
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    if df_filtrado.empty:
-        st.info("Nenhum produto encontrado com estes filtros.")
-    else:
-        colunas_produtos = st.columns(4)
-
-        for indice, (_, produto) in enumerate(df_filtrado.iterrows()):
-            with colunas_produtos[indice % 4]:
-                with st.container(border=True):
-                    foto = produto.get("Foto")
-                    if pd.notna(foto) and str(foto).strip():
-                        imagem = preparar_imagem_produto(str(foto))
-                    else:
-                        imagem = Image.new("RGB", (700, 560), (248, 251, 254))
-
-                    st.image(imagem, use_container_width=True)
-                    st.markdown(
-                        f'<div class="produto-titulo">{produto["Produto"]}</div>',
-                        unsafe_allow_html=True,
-                    )
-
-                    descricao, regra_minima = formatar_descricao_produto(
-                        produto.get("Descrição", "")
-                    )
-                    if descricao:
-                        st.markdown(
-                            f'<div class="produto-desc">{descricao}</div>',
-                            unsafe_allow_html=True,
-                        )
-                    if regra_minima:
-                        st.markdown(
-                            f'<div class="produto-regra-minima">{regra_minima}</div>',
-                            unsafe_allow_html=True,
-                        )
-
-                    preco = produto.get("Preço")
-                    if pd.notna(preco) and preco > 0:
-                        st.markdown(
-                            f'<div class="produto-preco">R$ {formatar_preco(preco)}</div>',
-                            unsafe_allow_html=True,
-                        )
-                        st.button(
-                            "Adicionar",
-                            key=f"adicionar_{indice}_{produto['Produto']}",
-                            type="primary",
-                            use_container_width=True,
-                            on_click=adicionar_ao_carrinho,
-                            args=(produto["Produto"], preco),
-                        )
-                    else:
-                        st.markdown(
-                            '<div class="produto-preco" style="font-size:1.1rem;">Sob consulta</div>',
-                            unsafe_allow_html=True,
-                        )
-                        st.button(
-                            "Consultar",
-                            key=f"consultar_{indice}_{produto['Produto']}",
-                            type="secondary",
-                            use_container_width=True,
-                        )
-
-st.markdown('<p class="rodape">© 2026 Patovaldo Distribuidora</p>', unsafe_allow_html=True)
+        if st.button("🗑️ Limpar Carrinho", use_container_width=True):
+            st.session_state.carrinho = {}
+            st.rerun()
