@@ -805,7 +805,7 @@ header_html = f"""
         <img src="{logo_src}" class="header-logo" alt="PatoValdo Distribuidora">
         <div class="header-text-block">
             <h1 class="header-title">PATOVALDO DISTRIBUIDORA</h1>
-            <p class="header-sub">Bebidas e guloseimas no atacado e varejo com pronta-entrega em <b>Patos de Minas e região</b>.</p>
+            <p class="header-sub">A Patovaldo Distribuidora de Bebidas e doces combina atendimento ágil e variedade de estoque para abastecer o seu comércio e realizar suas melhores festas em Patos de Minas!</b>.</p>
             <div class="header-tag">🚚 Entrega Rápida • Pedido Direto pelo WhatsApp</div>
         </div>
     </div>
@@ -816,7 +816,7 @@ st.markdown(header_html, unsafe_allow_html=True)
 # ================== PESQUISA ==================
 busca = st.text_input(
     "Buscar produtos",
-    placeholder="🔍 Buscar bebida, guloseima, marca...",
+    placeholder="🔍 Buscar bebida, doce, marca...",
     label_visibility="collapsed"
 )
 
