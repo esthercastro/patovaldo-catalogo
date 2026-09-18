@@ -805,7 +805,7 @@ header_html = f"""
         <img src="{logo_src}" class="header-logo" alt="PatoValdo Distribuidora">
         <div class="header-text-block">
             <h1 class="header-title">PATOVALDO DISTRIBUIDORA</h1>
-            <p class="header-sub">A Patovaldo Distribuidora de Bebidas e doces combina atendimento ágil e variedade de estoque para abastecer o seu comércio e realizar suas melhores festas em Patos de Minas!</b>.</p>
+            <p class="header-sub">A Patovaldo Distribuidora de Bebidas e Doces combina atendimento ágil e variedade de estoque para abastecer o seu comércio e realizar suas melhores festas em Patos de Minas</b>.</p>
             <div class="header-tag">🚚 Entrega Rápida • Pedido Direto pelo WhatsApp</div>
         </div>
     </div>
