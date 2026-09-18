@@ -137,6 +137,11 @@ st.markdown(seo_html, unsafe_allow_html=True)
 # ================== CSS CUSTOMIZADO RESPONSIVO (DESKTOP & MOBILE) ==================
 custom_css = """
 <style>
+    /* Rolagem suave para links de âncora */
+    html {
+        scroll-behavior: smooth;
+    }
+
     /* Variáveis Globais de Cores e Tipografia */
     :root {
         --azul-institucional: #183B5E;
@@ -594,12 +599,13 @@ custom_css = """
         margin-top: 2px;
     }
 
-    /* Botões de quantidade da sidebar alinhados */
-    div[data-testid="stSidebar"] div[data-testid="stHorizontalBlock"] {
+    /* Botões de quantidade alinhados */
+    div[data-testid="stSidebar"] div[data-testid="stHorizontalBlock"],
+    .st-key-carrinho_mobile_expander div[data-testid="stHorizontalBlock"] {
         align-items: center !important;
     }
 
-    /* Botão WhatsApp Sidebar */
+    /* Botão WhatsApp */
     .btn-whatsapp {
         display: flex;
         align-items: center;
@@ -626,15 +632,17 @@ custom_css = """
 
     /* ================= DESKTOP (TELAS ACIMA DE 768PX) ================= */
     @media (min-width: 769px) {
-        /* Barra móvel oculta no Desktop */
-        .mobile-floating-bar {
+        /* Barra móvel e expander mobile ocultos no Desktop */
+        .mobile-floating-bar,
+        .st-key-carrinho_mobile_expander,
+        .mobile-cart-marker {
             display: none !important;
         }
     }
 
     /* ================= MOBILE (TELAS ATÉ 768PX) ================= */
     @media (max-width: 768px) {
-        /* Ocultar sidebar no mobile */
+        /* Ocultar sidebar no mobile para dar foco ao expander in-page e barra flutuante */
         section[data-testid="stSidebar"] {
             display: none !important;
         }
@@ -647,8 +655,8 @@ custom_css = """
             padding-left: 0.75rem !important;
             padding-right: 0.75rem !important;
             padding-top: 0.5rem !important;
-            padding-bottom: 105px !important;
-            padding-bottom: calc(105px + env(safe-area-inset-bottom, 0px)) !important;
+            padding-bottom: 115px !important;
+            padding-bottom: calc(115px + env(safe-area-inset-bottom, 0px)) !important;
         }
 
         /* Cabeçalho Compacto e Marcante Mobile */
@@ -692,6 +700,37 @@ custom_css = """
             padding: 2px 7px !important;
         }
 
+        /* ================= ESTILIZAÇÃO DO EXPANDER DE CARRINHO MOBILE ================= */
+        .st-key-carrinho_mobile_expander {
+            background-color: #FFFFFF !important;
+            border: 2px solid var(--azul-institucional) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 4px 14px rgba(24, 59, 94, 0.12) !important;
+            margin-top: 0.4rem !important;
+            margin-bottom: 0.85rem !important;
+            overflow: hidden !important;
+        }
+        .st-key-carrinho_mobile_expander details {
+            border-radius: 10px !important;
+        }
+        .st-key-carrinho_mobile_expander summary {
+            background: linear-gradient(135deg, #183B5E 0%, #0d2238 100%) !important;
+            color: #FFFFFF !important;
+            font-weight: 800 !important;
+            font-size: 0.95rem !important;
+            padding: 11px 14px !important;
+            border-radius: 10px !important;
+        }
+        .st-key-carrinho_mobile_expander summary:hover {
+            background: linear-gradient(135deg, #1f4e7d 0%, #183B5E 100%) !important;
+        }
+        .st-key-carrinho_mobile_expander summary span {
+            color: #FFFFFF !important;
+        }
+        .st-key-carrinho_mobile_expander summary svg {
+            fill: #FFFFFF !important;
+        }
+
         /* Imagens compactas e centradas */
         .product-img-container {
             height: 140px !important;
@@ -723,7 +762,7 @@ custom_css = """
             margin-bottom: 8px !important;
         }
 
-        /* ================= BARRA FIXA DO WHATSAPP (MOBILE) ================= */
+        /* ================= BARRA FIXA DO WHATSAPP COM BOTÃO DE VER CARRINHO (MOBILE) ================= */
         .mobile-floating-bar {
             display: block !important;
             position: fixed !important;
@@ -733,10 +772,10 @@ custom_css = """
             width: 100% !important;
             background-color: #FFFFFF !important;
             border-top: 1px solid var(--borda-suave) !important;
-            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.12) !important;
             z-index: 999999 !important;
-            padding: 10px 14px !important;
-            padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+            padding: 8px 12px !important;
+            padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
             box-sizing: border-box !important;
         }
         .mobile-floating-content {
@@ -745,22 +784,43 @@ custom_css = """
             justify-content: space-between !important;
             max-width: 600px !important;
             margin: 0 auto !important;
-            gap: 12px !important;
+            gap: 8px !important;
         }
-        .mobile-floating-info {
+        .mobile-floating-info-link {
             display: flex !important;
             flex-direction: column !important;
+            text-decoration: none !important;
+            flex-shrink: 0 !important;
         }
         .mobile-floating-qtd {
-            font-size: 0.78rem !important;
+            font-size: 0.74rem !important;
             font-weight: 600 !important;
             color: var(--texto-secundario) !important;
         }
         .mobile-floating-total {
-            font-size: 1.15rem !important;
+            font-size: 1.08rem !important;
             font-weight: 800 !important;
             color: var(--azul-institucional) !important;
-            line-height: 1.2 !important;
+            line-height: 1.15 !important;
+        }
+        .mobile-floating-btn-cart {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background-color: #F1F5F9 !important;
+            color: var(--azul-institucional) !important;
+            border: 1.5px solid var(--azul-institucional) !important;
+            padding: 8px 10px !important;
+            border-radius: 8px !important;
+            font-weight: 700 !important;
+            font-size: 0.8rem !important;
+            text-decoration: none !important;
+            min-height: 40px !important;
+            white-space: nowrap !important;
+            transition: all 0.15s ease !important;
+        }
+        .mobile-floating-btn-cart:active {
+            background-color: #E2E8F0 !important;
         }
         .mobile-floating-btn {
             display: flex !important;
@@ -768,13 +828,13 @@ custom_css = """
             justify-content: center !important;
             background-color: var(--verde-whatsapp) !important;
             color: #FFFFFF !important;
-            padding: 10px 18px !important;
+            padding: 8px 14px !important;
             border-radius: 8px !important;
             font-weight: 800 !important;
-            font-size: 0.9rem !important;
+            font-size: 0.86rem !important;
             text-decoration: none !important;
             box-shadow: 0 2px 6px rgba(37, 211, 102, 0.3) !important;
-            min-height: 44px !important;
+            min-height: 40px !important;
             white-space: nowrap !important;
         }
         .mobile-floating-btn:active {
@@ -790,6 +850,39 @@ if 'carrinho' not in st.session_state:
     st.session_state.carrinho = {}
 if 'categoria_ativa' not in st.session_state:
     st.session_state.categoria_ativa = "Todos"
+if 'endereco' not in st.session_state:
+    st.session_state.endereco = ""
+if 'cupom' not in st.session_state:
+    st.session_state.cupom = ""
+
+
+# Callbacks para sincronização bidirecional de campos entre Mobile e Sidebar
+def sync_mobile_inputs():
+    val_end = st.session_state.get("m_endereco_input", "")
+    val_cup = st.session_state.get("m_cupom_input", "")
+    st.session_state.endereco = val_end
+    st.session_state.cupom = val_cup
+    st.session_state.s_endereco_input = val_end
+    st.session_state.s_cupom_input = val_cup
+
+
+def sync_sidebar_inputs():
+    val_end = st.session_state.get("s_endereco_input", "")
+    val_cup = st.session_state.get("s_cupom_input", "")
+    st.session_state.endereco = val_end
+    st.session_state.cupom = val_cup
+    st.session_state.m_endereco_input = val_end
+    st.session_state.m_cupom_input = val_cup
+
+
+if "m_endereco_input" not in st.session_state:
+    st.session_state.m_endereco_input = st.session_state.endereco
+if "s_endereco_input" not in st.session_state:
+    st.session_state.s_endereco_input = st.session_state.endereco
+if "m_cupom_input" not in st.session_state:
+    st.session_state.m_cupom_input = st.session_state.cupom
+if "s_cupom_input" not in st.session_state:
+    st.session_state.s_cupom_input = st.session_state.cupom
 
 
 # ================== CARREGAMENTO DO CATÁLOGO ==================
@@ -908,6 +1001,26 @@ def render_cart_item(item: dict):
     st.markdown(item_html, unsafe_allow_html=True)
 
 
+def gerar_link_whatsapp(carrinho: dict, total_sub: float, endereco: str, cupom: str) -> str:
+    linhas = []
+    for item in carrinho.values():
+        sub = item['preco'] * item['qtd']
+        linhas.append(f"• {item['qtd']}x {item['nome']} (R$ {sub:.2f})")
+
+    end_formatado = endereco.strip() if endereco and endereco.strip() else "A combinar / Retirada"
+
+    msg = "Olá! Gostaria de fazer o seguinte pedido na *Patovaldo Distribuidora*:\n\n"
+    msg += "*ITENS DO PEDIDO:*\n"
+    msg += "\n".join(linhas)
+    msg += f"\n\n*Subtotal dos itens:* R$ {total_sub:.2f}"
+    msg += f"\n*Endereço de Entrega:* {end_formatado}"
+    if cupom and cupom.strip():
+        msg += f"\n*Cupom:* {cupom.strip().upper()}"
+    msg += "\n\nAguardo confirmação da disponibilidade e taxa de entrega!"
+
+    return f"https://wa.me/{NUMERO_WHATSAPP}?text={quote(msg)}"
+
+
 # ================== CABEÇALHO HERO PREMIUM & CHAMATIVO ==================
 logo_src = f"data:image/png;base64,{LOGO_B64}" if LOGO_B64 else LOGO_PATH
 header_html = f"""
@@ -920,7 +1033,7 @@ header_html = f"""
             <h1 class="header-title">CATÁLOGO: PATOVALDO DISTRIBUIDORA</h1>
             <p class="header-sub">Variedade em bebidas e doces para abastecer seu comércio e transformar seus eventos em Patos de Minas.</p>
             <div class="header-tags-row">
-                <div class="header-tag-pill"> 👇 Escolha seu produtos!</div>
+                <div class="header-tag-pill"> 👇 Escolha seus produtos!</div>
             </div>
         </div>
     </div>
@@ -981,6 +1094,87 @@ prod_filtrados = [
 total_itens = sum(item["qtd"] for item in st.session_state.carrinho.values())
 total_subitens = sum(item["preco"] * item["qtd"] for item in st.session_state.carrinho.values())
 
+# ================== CARRINHO EXPANSÍVEL (EXCLUSIVO MOBILE) ==================
+# Exibido no topo da página no celular quando há produtos no carrinho
+if total_itens > 0:
+    st.markdown('<div id="carrinho-mobile" class="mobile-cart-marker"></div>', unsafe_allow_html=True)
+    with st.expander(
+        f"🛒 Ver / Concluir Pedido ({total_itens} {'item' if total_itens == 1 else 'itens'} • R$ {total_subitens:.2f})",
+        expanded=False,
+        key="carrinho_mobile_expander"
+    ):
+        st.markdown("<h4 style='color:#183B5E; margin:0 0 10px 0; font-size:1.05rem; font-weight:800;'>🛍️ Itens no seu Carrinho</h4>", unsafe_allow_html=True)
+
+        for item_id, item in list(st.session_state.carrinho.items()):
+            render_cart_item(item)
+
+            m1, m2, m3 = st.columns([1, 1, 1])
+            if m1.button("−", key=f"m_dec_{item_id}", use_container_width=True):
+                if item['qtd'] > 1:
+                    item['qtd'] -= 1
+                else:
+                    del st.session_state.carrinho[item_id]
+                st.rerun()
+
+            m2.markdown(
+                f"<div style='text-align:center; color:#1E293B; font-weight:700; padding-top:6px;'>{item['qtd']}</div>",
+                unsafe_allow_html=True
+            )
+
+            if m3.button("＋", key=f"m_inc_{item_id}", use_container_width=True):
+                item['qtd'] += 1
+                st.rerun()
+
+        st.markdown("<hr style='margin: 1rem 0; border-color: #E2E8F0;'>", unsafe_allow_html=True)
+
+        # Dados para entrega
+        st.markdown("<p style='font-weight:700; color:#1E293B; font-size:0.9rem; margin-bottom:4px;'>📍 Endereço de Entrega (Opcional):</p>", unsafe_allow_html=True)
+        st.text_input(
+            "Endereço de entrega:",
+            placeholder="Ex: Rua Major Gote, 1200 - Centro",
+            label_visibility="collapsed",
+            key="m_endereco_input",
+            on_change=sync_mobile_inputs
+        )
+
+        if CAMINHO_MAPA and CAMINHO_MAPA.exists():
+            with st.expander("🗺️ Ver Zonas de Entrega e Taxas", key="m_exp_zonas"):
+                st.image(str(CAMINHO_MAPA), caption="Zonas de Entrega em Patos de Minas", use_container_width=True)
+
+        # Campo Cupom (Facultativo / Opcional)
+        st.markdown("<p style='font-weight:700; color:#1E293B; font-size:0.9rem; margin-top:8px; margin-bottom:4px;'>🏷️ Cupom (Opcional):</p>", unsafe_allow_html=True)
+        st.text_input(
+            "Cupom:",
+            placeholder="Ex: PATOVALDO10",
+            label_visibility="collapsed",
+            key="m_cupom_input",
+            on_change=sync_mobile_inputs
+        )
+
+        st.markdown(f"""
+            <div style="background-color:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:12px; margin: 12px 0;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-weight:600; color:#166534;">Subtotal do Pedido:</span>
+                    <span style="font-size:1.25rem; font-weight:800; color:#15803D;">R$ {total_subitens:.2f}</span>
+                </div>
+                <div style="font-size:0.75rem; color:#166534; margin-top:2px;">* Taxa de entrega calculada via WhatsApp</div>
+            </div>
+        """, unsafe_allow_html=True)
+
+        link_zap_mobile = gerar_link_whatsapp(
+            st.session_state.carrinho, total_subitens, st.session_state.endereco, st.session_state.cupom
+        )
+
+        st.markdown(f"""
+            <a href="{link_zap_mobile}" target="_blank" class="btn-whatsapp">
+                📲 Finalizar Pedido no WhatsApp
+            </a>
+        """, unsafe_allow_html=True)
+
+        if st.button("🗑️ Limpar Carrinho", key="m_limpar_carrinho", use_container_width=True):
+            st.session_state.carrinho = {}
+            st.rerun()
+
 # ================== GRADE DE PRODUTOS ==================
 if not prod_filtrados:
     st.info(f"Nenhum produto encontrado para a categoria **{st.session_state.categoria_ativa}** ou termo de busca.")
@@ -990,7 +1184,7 @@ else:
     for idx, p in enumerate(prod_filtrados):
         with cols[idx % num_colunas]:
             render_product_card(p)
-            
+
             if st.button("➕ Adicionar", key=f"add_{p['id']}", use_container_width=True):
                 if p['id'] in st.session_state.carrinho:
                     st.session_state.carrinho[p['id']]['qtd'] += 1
@@ -1022,18 +1216,13 @@ with st.sidebar:
             </div>
         """, unsafe_allow_html=True)
     else:
-        linhas_whatsapp = []
-
         for item_id, item in list(st.session_state.carrinho.items()):
-            subtotal = item['preco'] * item['qtd']
-            linhas_whatsapp.append(f"• {item['qtd']}x {item['nome']} (R$ {subtotal:.2f})")
-
             # Card individual de produto no carrinho
             render_cart_item(item)
 
             # Controles de quantidade (+, -, remover)
             c1, c2, c3 = st.columns([1, 1, 1])
-            if c1.button("−", key=f"dec_{item_id}", use_container_width=True):
+            if c1.button("−", key=f"s_dec_{item_id}", use_container_width=True):
                 if item['qtd'] > 1:
                     item['qtd'] -= 1
                 else:
@@ -1045,7 +1234,7 @@ with st.sidebar:
                 unsafe_allow_html=True
             )
 
-            if c3.button("＋", key=f"inc_{item_id}", use_container_width=True):
+            if c3.button("＋", key=f"s_inc_{item_id}", use_container_width=True):
                 item['qtd'] += 1
                 st.rerun()
 
@@ -1053,15 +1242,27 @@ with st.sidebar:
 
         # Dados para entrega
         st.markdown("<p style='font-weight:700; color:#1E293B; font-size:0.9rem; margin-bottom:4px;'>📍 Endereço de Entrega (Opcional):</p>", unsafe_allow_html=True)
-        endereco_cliente = st.text_input(
+        st.text_input(
             "Endereço de entrega:",
             placeholder="Ex: Rua Major Gote, 1200 - Centro",
-            label_visibility="collapsed"
+            label_visibility="collapsed",
+            key="s_endereco_input",
+            on_change=sync_sidebar_inputs
         )
 
         if CAMINHO_MAPA and CAMINHO_MAPA.exists():
-            with st.expander("🗺️ Ver Zonas de Entrega e Taxas"):
+            with st.expander("🗺️ Ver Zonas de Entrega e Taxas", key="s_exp_zonas"):
                 st.image(str(CAMINHO_MAPA), caption="Zonas de Entrega em Patos de Minas", use_container_width=True)
+
+        # Campo Cupom (Facultativo / Opcional)
+        st.markdown("<p style='font-weight:700; color:#1E293B; font-size:0.9rem; margin-top:8px; margin-bottom:4px;'>🏷️ Cupom (Opcional):</p>", unsafe_allow_html=True)
+        st.text_input(
+            "Cupom:",
+            placeholder="Ex: PATOVALDO10",
+            label_visibility="collapsed",
+            key="s_cupom_input",
+            on_change=sync_sidebar_inputs
+        )
 
         st.markdown(f"""
             <div style="background-color:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:12px; margin: 12px 0;">
@@ -1073,14 +1274,9 @@ with st.sidebar:
             </div>
         """, unsafe_allow_html=True)
 
-        # Montagem da mensagem formatada para o WhatsApp
-        resumo_whatsapp = "Olá! Gostaria de fazer o seguinte pedido na *Patovaldo Distribuidora*:\n\n"
-        resumo_whatsapp += "*ITENS DO PEDIDO:*\n"
-        resumo_whatsapp += "\n".join(linhas_whatsapp)
-        resumo_whatsapp += f"\n\n*Subtotal dos itens:* R$ {total_subitens:.2f}"
-        resumo_whatsapp += f"\n*Endereço de Entrega:* {endereco_cliente.strip() if endereco_cliente.strip() else 'A combinar / Retirada'}"
-
-        link_whatsapp = f"https://wa.me/{NUMERO_WHATSAPP}?text={quote(resumo_whatsapp)}"
+        link_whatsapp = gerar_link_whatsapp(
+            st.session_state.carrinho, total_subitens, st.session_state.endereco, st.session_state.cupom
+        )
 
         # Botão de Envio para o WhatsApp
         st.markdown(f"""
@@ -1089,27 +1285,29 @@ with st.sidebar:
             </a>
         """, unsafe_allow_html=True)
 
-        if st.button("🗑️ Limpar Carrinho", use_container_width=True):
+        if st.button("🗑️ Limpar Carrinho", key="s_limpar_carrinho", use_container_width=True):
             st.session_state.carrinho = {}
             st.rerun()
 
-# ================== BARRA FIXA DO WHATSAPP (EXCLUSIVA MOBILE) ==================
+# ================== BARRA FIXA DO WHATSAPP COM LINK DO CARRINHO (EXCLUSIVA MOBILE) ==================
 # Exibida de forma fixa na parte inferior do celular quando há itens no carrinho
 if total_itens > 0:
-    if 'link_whatsapp' not in locals():
-        resumo_padrao = f"Olá! Gostaria de fazer um pedido no valor de R$ {total_subitens:.2f} ({total_itens} itens)."
-        link_whatsapp = f"https://wa.me/{NUMERO_WHATSAPP}?text={quote(resumo_padrao)}"
-
+    link_zap_float = gerar_link_whatsapp(
+        st.session_state.carrinho, total_subitens, st.session_state.endereco, st.session_state.cupom
+    )
     texto_qtd = "1 item" if total_itens == 1 else f"{total_itens} itens"
     st.markdown(f"""
         <div class="mobile-floating-bar">
             <div class="mobile-floating-content">
-                <div class="mobile-floating-info">
+                <a href="#carrinho-mobile" class="mobile-floating-info-link" title="Toque para ver os produtos">
                     <span class="mobile-floating-qtd">🛒 {texto_qtd}</span>
                     <span class="mobile-floating-total">R$ {total_subitens:.2f}</span>
-                </div>
-                <a href="{link_whatsapp}" target="_blank" class="mobile-floating-btn">
-                    Finalizar no WhatsApp ➔
+                </a>
+                <a href="#carrinho-mobile" class="mobile-floating-btn-cart">
+                    Ver Pedido 📝
+                </a>
+                <a href="{link_zap_float}" target="_blank" class="mobile-floating-btn">
+                    Pedir no Zap ➔
                 </a>
             </div>
         </div>
