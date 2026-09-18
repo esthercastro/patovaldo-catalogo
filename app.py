@@ -917,11 +917,10 @@ header_html = f"""
             <img src="{logo_src}" class="header-logo" alt="PatoValdo Distribuidora">
         </div>
         <div class="header-text-block">
-            <div class="header-badge-distribuidora"> Distribuidora de Bebidas & Doces</div>
-            <h1 class="header-title">PATOVALDO DISTRIBUIDORA</h1>
+            <h1 class="header-title">CATÁLOGO: PATOVALDO DISTRIBUIDORA</h1>
             <p class="header-sub">Variedade em bebidas e doces para abastecer seu comércio e transformar seus eventos em Patos de Minas.</p>
             <div class="header-tags-row">
-                <div class="header-tag-pill">🚚 Entrega rápida</div>
+                <div class="header-tag-pill"> 👇 Escolha seu produtos!</div>
             </div>
         </div>
     </div>
