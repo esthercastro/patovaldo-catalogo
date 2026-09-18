@@ -19,6 +19,8 @@ PASTA_ASSETS = PASTA_PROJETO / "assets"
 
 def buscar_logo() -> str:
     candidatos = [
+        PASTA_PROJETO / "logo_destaque.png",
+        Path("logo_destaque.png"),
         PASTA_PROJETO / "logo.png",
         Path("logo.png"),
         PASTA_ASSETS / "logo.png",
@@ -34,12 +36,38 @@ LOGO_PATH = buscar_logo()
 
 
 def carregar_logo_b64() -> str:
-    try:
-        if os.path.exists(LOGO_PATH):
-            with open(LOGO_PATH, "rb") as img_file:
-                return base64.b64encode(img_file.read()).decode("utf-8")
-    except Exception:
-        pass
+    """Carrega a logo, aplicando auto-trimming das margens brancas para que o mascote e texto fiquem grandes e nítidos."""
+    candidatos = [
+        PASTA_PROJETO / "logo_destaque.png",
+        Path("logo_destaque.png"),
+        PASTA_PROJETO / "logo.png",
+        Path("logo.png"),
+    ]
+    for c in candidatos:
+        if c.exists():
+            try:
+                from PIL import Image, ImageChops
+                im = Image.open(c)
+                # Remove o excesso de borda branca da imagem original (1600x1600)
+                bg = Image.new("RGB", im.size, (255, 255, 255))
+                diff = ImageChops.difference(im.convert("RGB"), bg)
+                bbox = diff.getbbox()
+                if bbox:
+                    pad = 18
+                    b = (
+                        max(0, bbox[0] - pad),
+                        max(0, bbox[1] - pad),
+                        min(im.size[0], bbox[2] + pad),
+                        min(im.size[1], bbox[3] + pad),
+                    )
+                    im = im.crop(b)
+                im.thumbnail((450, 450), Image.Resampling.LANCZOS)
+                buf = io.BytesIO()
+                im.save(buf, format="PNG", optimize=True)
+                return base64.b64encode(buf.getvalue()).decode("utf-8")
+            except Exception:
+                with open(c, "rb") as f:
+                    return base64.b64encode(f.read()).decode("utf-8")
     return ""
 
 
@@ -159,59 +187,124 @@ custom_css = """
         max-width: 1280px;
     }
 
-    /* ================= CABEÇALHO RESPONSIVO ================= */
+    /* ================= CABEÇALHO HERO PREMIUM & CHAMATIVO ================= */
     .header-container {
-        background-color: #FFFFFF;
-        border: 1px solid var(--borda-suave);
-        border-radius: 12px;
-        padding: 0.85rem 1.25rem;
-        margin-bottom: 0.75rem;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        background: linear-gradient(135deg, #0d2238 0%, #183B5E 55%, #1f4e7d 100%);
+        border-radius: 16px;
+        padding: 1.25rem 1.75rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 8px 24px rgba(16, 37, 60, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        position: relative;
+        overflow: hidden;
+    }
+    /* Efeito de luz dourada sutil */
+    .header-container::after {
+        content: '';
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 190px;
+        height: 190px;
+        background: radial-gradient(circle, rgba(233, 184, 63, 0.22) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
     }
     .header-brand-row {
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 20px;
+        position: relative;
+        z-index: 1;
+    }
+    /* Card da Logo em Destaque (ampliada e nítida) */
+    .header-logo-badge {
+        background-color: #FFFFFF;
+        border-radius: 14px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+        flex-shrink: 0;
+        width: 145px;
+        height: 110px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .header-logo-badge:hover {
+        transform: scale(1.03);
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
     }
     .header-logo {
-        width: 120px;
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
         height: auto;
-        max-height: 90px;
         object-fit: contain;
-        flex-shrink: 0;
+        display: block;
     }
     .header-text-block {
         display: flex;
         flex-direction: column;
         justify-content: center;
+        gap: 3px;
+    }
+    .header-badge-distribuidora {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        background: rgba(233, 184, 63, 0.18);
+        color: #FCE588;
+        border: 1px solid rgba(233, 184, 63, 0.45);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        padding: 2px 8px;
+        border-radius: 4px;
+        margin-bottom: 2px;
     }
     .header-title {
-        font-size: 1.75rem;
-        font-weight: 800;
-        color: var(--azul-institucional);
+        font-size: 1.95rem;
+        font-weight: 900;
+        color: #FFFFFF !important;
         margin: 0 !important;
         padding: 0 !important;
         letter-spacing: -0.5px;
         line-height: 1.15;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
     .header-sub {
-        font-size: 0.9rem;
-        color: var(--texto-secundario);
-        margin: 0.2rem 0 0.35rem 0 !important;
-        line-height: 1.35;
+        font-size: 0.92rem;
+        color: #E2E8F0 !important;
+        margin: 0.15rem 0 0.45rem 0 !important;
+        line-height: 1.4;
+        max-width: 820px;
     }
-    .header-tag {
+    .header-tags-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+    }
+    .header-tag-pill {
         display: inline-flex;
         align-items: center;
-        width: fit-content;
-        gap: 6px;
-        background-color: #EFF6FF;
-        color: #1D4ED8;
+        gap: 5px;
+        background: rgba(255, 255, 255, 0.14);
+        backdrop-filter: blur(4px);
+        color: #FFFFFF;
         font-size: 0.78rem;
         font-weight: 600;
         padding: 3px 10px;
         border-radius: 9999px;
-        border: 1px solid #DBEAFE;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+    }
+    .header-tag-destaque {
+        background: linear-gradient(135deg, #25D366 0%, #15803D 100%) !important;
+        border: 1px solid rgba(37, 211, 102, 0.6) !important;
+        color: #FFFFFF !important;
+        box-shadow: 0 2px 8px rgba(37, 211, 102, 0.35);
     }
 
     /* Barra de Pesquisa */
@@ -558,34 +651,48 @@ custom_css = """
             padding-bottom: calc(105px + env(safe-area-inset-bottom, 0px)) !important;
         }
 
-        /* Cabeçalho Compacto Mobile */
+        /* Cabeçalho Compacto e Marcante Mobile */
         .header-container {
-            padding: 0.5rem 0.75rem !important;
-            margin-bottom: 0.45rem !important;
-            border-radius: 10px !important;
+            padding: 0.75rem 0.9rem !important;
+            margin-bottom: 0.55rem !important;
+            border-radius: 12px !important;
         }
         .header-brand-row {
-            gap: 10px !important;
+            gap: 12px !important;
+            align-items: center !important;
         }
-        .header-logo {
-            width: 68px !important; /* 65px - 70px */
-            max-height: 68px !important;
+        .header-logo-badge {
+            width: 85px !important;
+            height: 75px !important;
+            padding: 4px 6px !important;
+            border-radius: 10px !important;
         }
         .header-title {
-            font-size: 1.15rem !important;
+            font-size: 1.22rem !important;
             line-height: 1.15 !important;
         }
-        .header-sub {
-            font-size: 0.76rem !important;
-            margin: 0.15rem 0 0.25rem 0 !important;
-            line-height: 1.25 !important;
+        .header-badge-distribuidora {
+            font-size: 0.62rem !important;
+            padding: 1px 6px !important;
         }
-        .header-tag {
+        .header-sub {
+            font-size: 0.75rem !important;
+            line-height: 1.25 !important;
+            margin: 0.1rem 0 0.3rem 0 !important;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .header-tags-row {
+            gap: 5px !important;
+        }
+        .header-tag-pill {
             font-size: 0.68rem !important;
             padding: 2px 7px !important;
         }
 
-        /* Imagens mais compactas no mobile para visualização ágil */
+        /* Imagens compactas e centradas */
         .product-img-container {
             height: 140px !important;
             padding: 6px !important;
@@ -710,7 +817,10 @@ def parse_descricao(descricao: str) -> tuple[str, str]:
 
 def linhas_para_produtos(csv_texto: str) -> list[dict]:
     produtos_lidos = []
-    leitor = csv.DictReader(io.StringIO(csv_texto))
+    # Suporte flexível automático para separadores de vírgula ou ponto-e-vírgula
+    primeira_linha = csv_texto.splitlines()[0] if csv_texto.splitlines() else ""
+    delimitador = ";" if ";" in primeira_linha else ","
+    leitor = csv.DictReader(io.StringIO(csv_texto), delimiter=delimitador)
     for linha in leitor:
         nome = (linha.get("produto") or "").strip()
         if not nome:
@@ -780,6 +890,7 @@ def render_product_card(p: dict):
 
     st.markdown(card_html, unsafe_allow_html=True)
 
+
 def render_cart_item(item: dict):
     subtotal = item["preco"] * item["qtd"]
     item_html = f"""
@@ -797,16 +908,21 @@ def render_cart_item(item: dict):
     st.markdown(item_html, unsafe_allow_html=True)
 
 
-# ================== CABEÇALHO DA PÁGINA (COMPACTO E NÍTIDO) ==================
+# ================== CABEÇALHO HERO PREMIUM & CHAMATIVO ==================
 logo_src = f"data:image/png;base64,{LOGO_B64}" if LOGO_B64 else LOGO_PATH
 header_html = f"""
 <div class="header-container">
     <div class="header-brand-row">
-        <img src="{logo_src}" class="header-logo" alt="PatoValdo Distribuidora">
+        <div class="header-logo-badge">
+            <img src="{logo_src}" class="header-logo" alt="PatoValdo Distribuidora">
+        </div>
         <div class="header-text-block">
+            <div class="header-badge-distribuidora"> Distribuidora de Bebidas & Doces</div>
             <h1 class="header-title">PATOVALDO DISTRIBUIDORA</h1>
-            <p class="header-sub">A Patovaldo Distribuidora de Bebidas e Doces combina atendimento ágil e variedade de estoque para abastecer o seu comércio e realizar suas melhores festas em Patos de Minas</b>.</p>
-            <div class="header-tag">🚚 Entrega Rápida • Pedido Direto pelo WhatsApp</div>
+            <p class="header-sub">Variedade em bebidas e doces para abastecer seu comércio e transformar seus eventos em Patos de Minas.</p>
+            <div class="header-tags-row">
+                <div class="header-tag-pill">🚚 Entrega rápida</div>
+            </div>
         </div>
     </div>
 </div>
