@@ -1079,7 +1079,6 @@ with st.sidebar:
         resumo_whatsapp += "\n".join(linhas_whatsapp)
         resumo_whatsapp += f"\n\n*Subtotal dos itens:* R$ {total_subitens:.2f}"
         resumo_whatsapp += f"\n*Endereço de Entrega:* {endereco_cliente.strip() if endereco_cliente.strip() else 'A combinar / Retirada'}"
-        resumo_whatsapp += "\n\nPor favor, confirme a disponibilidade e o valor da entrega. Obrigado!"
 
         link_whatsapp = f"https://wa.me/{NUMERO_WHATSAPP}?text={quote(resumo_whatsapp)}"
 
