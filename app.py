@@ -81,15 +81,15 @@ st.set_page_config(
 # ================== SEO & META TAGS / JSON-LD ==================
 seo_html = """
 <head>
-    <meta name="description" content="PatoValdo Distribuidora em Patos de Minas e região. Bebidas, alimentos, guloseimas e atacado para comércios, festas e eventos com pronta-entrega. Faça seu pedido online!">
-    <meta name="keywords" content="Patos de Minas, distribuidora, bebidas, guloseimas, atacado, cerveja, refrigerante, doces, entrega rápida, PatoValdo">
+    <meta name="description" content="PatoValdo Distribuidora de Bebidas e Doces em Patos de Minas. Atacado para comércios, festas e eventos com pronta-entrega. Faça seu pedido online por WhatsApp!">
+    <meta name="keywords" content="Patos de Minas, distribuidora, bebidas, doces, guloseimas, atacado, entrega rápida, Patovaldo">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WholesaleStore",
       "name": "PatoValdo Distribuidora",
-      "description": "Distribuidora de bebidas e guloseimas no atacado e varejo em Patos de Minas e região.",
+      "description": "Nossas bebidas e doces estão presentes nas melhores festas de Patos de Minas e região! A Patovaldo combina atendimento ágil e variedade de estoque para abastecer o seu comércio.",
       "telephone": "+553484012444",
       "address": {
         "@type": "PostalAddress",
