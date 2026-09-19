@@ -550,18 +550,18 @@ custom_css = """
     .cart-card {
         background: #F8FAFC;
         border: 1px solid var(--borda-suave);
-        border-radius: 8px;
-        padding: 8px 10px;
-        margin-bottom: 8px;
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin-bottom: 6px;
     }
     .cart-item-flex {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
     }
     .cart-img {
-        width: 44px;
-        height: 44px;
+        width: 48px;
+        height: 48px;
         object-fit: contain;
         border-radius: 6px;
         background: #FFFFFF;
@@ -572,14 +572,203 @@ custom_css = """
     .item-carrinho-titulo {
         color: var(--texto-principal);
         font-weight: 700;
-        font-size: 0.86rem;
-        line-height: 1.2;
+        font-size: 0.9rem;
+        line-height: 1.25;
     }
     .item-carrinho-subtotal {
         color: var(--azul-institucional);
         font-weight: 800;
-        font-size: 0.92rem;
+        font-size: 0.96rem;
         margin-top: 2px;
+    }
+
+    /* ================= CONTROLES DE QUANTIDADE HORIZONTAIS (+, QTD, - NA MESMA LINHA - ESTILO FOTO 3) ================= */
+    /* Container que une os três elementos de forma centralizada e compacta */
+    div[data-testid="stHorizontalBlock"]:has(div[class*="st-key-m_dec_"]),
+    div[data-testid="stHorizontalBlock"]:has(div[class*="st-key-s_dec_"]) {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 12px !important;
+        width: 100% !important;
+        max-width: 200px !important;
+        margin: 6px auto 14px auto !important;
+    }
+
+    /* Coluna do botão Menos (-) */
+    div[data-testid="stColumn"]:has(div[class*="st-key-m_dec_"]),
+    div[data-testid="stColumn"]:has(div[class*="st-key-s_dec_"]),
+    div[data-testid="column"]:has(div[class*="st-key-m_dec_"]),
+    div[data-testid="column"]:has(div[class*="st-key-s_dec_"]),
+    div.stColumn:has(div[class*="st-key-m_dec_"]),
+    div.stColumn:has(div[class*="st-key-s_dec_"]) {
+        width: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
+        flex: 0 0 50px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Coluna do número de quantidade */
+    div[data-testid="stColumn"]:has(.cart-item-qtd),
+    div[data-testid="column"]:has(.cart-item-qtd),
+    div.stColumn:has(.cart-item-qtd) {
+        width: 42px !important;
+        min-width: 42px !important;
+        max-width: 42px !important;
+        flex: 0 0 42px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Coluna do botão Mais (+) */
+    div[data-testid="stColumn"]:has(div[class*="st-key-m_inc_"]),
+    div[data-testid="stColumn"]:has(div[class*="st-key-s_inc_"]),
+    div[data-testid="column"]:has(div[class*="st-key-m_inc_"]),
+    div[data-testid="column"]:has(div[class*="st-key-s_inc_"]),
+    div.stColumn:has(div[class*="st-key-m_inc_"]),
+    div.stColumn:has(div[class*="st-key-s_inc_"]) {
+        width: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
+        flex: 0 0 50px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Wrappers dos botões */
+    div[class*="st-key-m_dec_"],
+    div[class*="st-key-m_inc_"],
+    div[class*="st-key-s_dec_"],
+    div[class*="st-key-s_inc_"] {
+        width: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
+        height: 38px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    div[class*="st-key-m_dec_"] div[data-testid="stButton"],
+    div[class*="st-key-m_inc_"] div[data-testid="stButton"],
+    div[class*="st-key-s_dec_"] div[data-testid="stButton"],
+    div[class*="st-key-s_inc_"] div[data-testid="stButton"] {
+        width: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
+        height: 38px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    /* Botões '+' e '-' estilo Foto 3: brancos, bordas suaves, compactos e amigáveis */
+    div[class*="st-key-m_dec_"] button,
+    div[class*="st-key-m_inc_"] button,
+    div[class*="st-key-s_dec_"] button,
+    div[class*="st-key-s_inc_"] button {
+        background-color: #FFFFFF !important;
+        color: #1E293B !important;
+        border: 1.5px solid #CBD5E1 !important;
+        border-radius: 10px !important;
+        width: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
+        height: 38px !important;
+        min-height: 38px !important;
+        max-height: 38px !important;
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        line-height: 1 !important;
+        transition: all 0.15s ease !important;
+    }
+
+    div[class*="st-key-m_dec_"] button:hover,
+    div[class*="st-key-m_inc_"] button:hover,
+    div[class*="st-key-s_dec_"] button:hover,
+    div[class*="st-key-s_inc_"] button:hover {
+        background-color: #F8FAFC !important;
+        border-color: #94A3B8 !important;
+        color: #0F172A !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    div[class*="st-key-m_dec_"] button:active,
+    div[class*="st-key-m_inc_"] button:active,
+    div[class*="st-key-s_dec_"] button:active,
+    div[class*="st-key-s_inc_"] button:active {
+        background-color: #E2E8F0 !important;
+        transform: translateY(0px) !important;
+    }
+
+    div[class*="st-key-m_dec_"] button div[data-testid="stMarkdownContainer"] p,
+    div[class*="st-key-m_inc_"] button div[data-testid="stMarkdownContainer"] p,
+    div[class*="st-key-s_dec_"] button div[data-testid="stMarkdownContainer"] p,
+    div[class*="st-key-s_inc_"] button div[data-testid="stMarkdownContainer"] p {
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: 1 !important;
+        font-size: 1.25rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    /* Alinhamento vertical perfeito da quantidade no mesmo nível dos botões */
+    div[data-testid="stColumn"]:has(.cart-item-qtd) div[data-testid="stMarkdownContainer"],
+    div[data-testid="stColumn"]:has(.cart-item-qtd) div[data-testid="stMarkdownContainer"] p,
+    div[data-testid="column"]:has(.cart-item-qtd) div[data-testid="stMarkdownContainer"],
+    div[data-testid="column"]:has(.cart-item-qtd) div[data-testid="stMarkdownContainer"] p,
+    div.stColumn:has(.cart-item-qtd) div[data-testid="stMarkdownContainer"],
+    div.stColumn:has(.cart-item-qtd) div[data-testid="stMarkdownContainer"] p {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: 38px !important;
+        line-height: 38px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .cart-item-qtd {
+        width: 42px !important;
+        min-width: 42px !important;
+        text-align: center !important;
+        color: #0F172A !important;
+        font-weight: 800 !important;
+        font-size: 1.25rem !important;
+        height: 38px !important;
+        line-height: 38px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        user-select: none !important;
     }
 
     /* Botão WhatsApp Desktop Sidebar */
@@ -773,11 +962,64 @@ custom_css = """
             flex-wrap: wrap !important;
             gap: 8px !important;
         }
-        div[data-testid="stHorizontalBlock"]:has(.product-card) > div[data-testid="column"] {
+        div[data-testid="stHorizontalBlock"]:has(.product-card) > div[data-testid="stColumn"],
+        div[data-testid="stHorizontalBlock"]:has(.product-card) > div[data-testid="column"],
+        div[data-testid="stHorizontalBlock"]:has(.product-card) > div.stColumn {
             flex: 1 1 calc(50% - 6px) !important;
             min-width: calc(50% - 6px) !important;
             max-width: calc(50% - 6px) !important;
             margin-bottom: 8px !important;
+        }
+
+        /* Assegura alinhamento horizontal dos botões de quantidade no celular */
+        div[data-testid="stHorizontalBlock"]:has(div[class*="st-key-m_dec_"]),
+        div[data-testid="stHorizontalBlock"]:has(div[class*="st-key-s_dec_"]) {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 12px !important;
+            width: 100% !important;
+            max-width: 200px !important;
+            margin: 6px auto 14px auto !important;
+        }
+
+        div[data-testid="stColumn"]:has(div[class*="st-key-m_dec_"]),
+        div[data-testid="stColumn"]:has(div[class*="st-key-s_dec_"]),
+        div[data-testid="stColumn"]:has(div[class*="st-key-m_inc_"]),
+        div[data-testid="stColumn"]:has(div[class*="st-key-s_inc_"]),
+        div[data-testid="column"]:has(div[class*="st-key-m_dec_"]),
+        div[data-testid="column"]:has(div[class*="st-key-s_dec_"]),
+        div[data-testid="column"]:has(div[class*="st-key-m_inc_"]),
+        div[data-testid="column"]:has(div[class*="st-key-s_inc_"]),
+        div.stColumn:has(div[class*="st-key-m_dec_"]),
+        div.stColumn:has(div[class*="st-key-s_dec_"]),
+        div.stColumn:has(div[class*="st-key-m_inc_"]),
+        div.stColumn:has(div[class*="st-key-s_inc_"]) {
+            width: 50px !important;
+            min-width: 50px !important;
+            max-width: 50px !important;
+            flex: 0 0 50px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        div[data-testid="stColumn"]:has(.cart-item-qtd),
+        div[data-testid="column"]:has(.cart-item-qtd),
+        div.stColumn:has(.cart-item-qtd) {
+            width: 42px !important;
+            min-width: 42px !important;
+            max-width: 42px !important;
+            flex: 0 0 42px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
 
         /* ================= BOTÃO FLUTUANTE INFERIOR EXCLUSIVO MOBILE ================= */
@@ -1037,25 +1279,29 @@ if st.session_state.ver_carrinho and total_itens > 0:
         </div>
     """, unsafe_allow_html=True)
 
-    # Lista dos produtos no carrinho com ajuste de quantidade
+    # Lista dos produtos no carrinho com ajuste de quantidade HORIZONTAL (Estilo Foto 3)
     for item_id, item in list(st.session_state.carrinho.items()):
         render_cart_item(item)
-        m1, m2, m3 = st.columns([1, 1, 1])
-        if m1.button("−", key=f"m_dec_{item_id}", use_container_width=True):
-            if item['qtd'] > 1:
-                item['qtd'] -= 1
-            else:
-                del st.session_state.carrinho[item_id]
-            st.rerun()
 
-        m2.markdown(
-            f"<div style='text-align:center; color:#1E293B; font-weight:700; padding-top:6px;'>{item['qtd']}</div>",
-            unsafe_allow_html=True
-        )
+        col_q1, col_q2, col_q3 = st.columns([1, 1, 1], gap="small")
+        with col_q1:
+            if st.button("−", key=f"m_dec_{item_id}", use_container_width=True):
+                if item['qtd'] > 1:
+                    item['qtd'] -= 1
+                else:
+                    del st.session_state.carrinho[item_id]
+                st.rerun()
 
-        if m3.button("＋", key=f"m_inc_{item_id}", use_container_width=True):
-            item['qtd'] += 1
-            st.rerun()
+        with col_q2:
+            st.markdown(
+                f"<div class='cart-item-qtd'>{item['qtd']}</div>",
+                unsafe_allow_html=True
+            )
+
+        with col_q3:
+            if st.button("＋", key=f"m_inc_{item_id}", use_container_width=True):
+                item['qtd'] += 1
+                st.rerun()
 
     st.markdown("<hr style='margin: 1.25rem 0; border-color: #E2E8F0;'>", unsafe_allow_html=True)
 
@@ -1234,22 +1480,25 @@ with st.sidebar:
         for item_id, item in list(st.session_state.carrinho.items()):
             render_cart_item(item)
 
-            c1, c2, c3 = st.columns([1, 1, 1])
-            if c1.button("−", key=f"s_dec_{item_id}", use_container_width=True):
-                if item['qtd'] > 1:
-                    item['qtd'] -= 1
-                else:
-                    del st.session_state.carrinho[item_id]
-                st.rerun()
+            col_s1, col_s2, col_s3 = st.columns([1, 1, 1], gap="small")
+            with col_s1:
+                if st.button("−", key=f"s_dec_{item_id}", use_container_width=True):
+                    if item['qtd'] > 1:
+                        item['qtd'] -= 1
+                    else:
+                        del st.session_state.carrinho[item_id]
+                    st.rerun()
 
-            c2.markdown(
-                f"<div style='text-align:center; color:#1E293B; font-weight:700; padding-top:6px;'>{item['qtd']}</div>",
-                unsafe_allow_html=True
-            )
+            with col_s2:
+                st.markdown(
+                    f"<div class='cart-item-qtd'>{item['qtd']}</div>",
+                    unsafe_allow_html=True
+                )
 
-            if c3.button("＋", key=f"s_inc_{item_id}", use_container_width=True):
-                item['qtd'] += 1
-                st.rerun()
+            with col_s3:
+                if st.button("＋", key=f"s_inc_{item_id}", use_container_width=True):
+                    item['qtd'] += 1
+                    st.rerun()
 
         st.markdown("<hr style='margin: 1rem 0; border-color: #E2E8F0;'>", unsafe_allow_html=True)
 
