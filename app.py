@@ -103,7 +103,7 @@ st.set_page_config(
     page_title="PatoValdo Distribuidora | Catálogo Online",
     page_icon=LOGO_PATH if os.path.exists(LOGO_PATH) else "📦",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # ================== SEO & META TAGS / JSON-LD ==================
@@ -517,10 +517,13 @@ custom_css = """
         transform: translateY(-1px);
     }
 
-    /* ================= SIDEBAR (DESKTOP) ================= */
+    /* ================= EXPERIÊNCIA UNIFICADA DO CARRINHO (DESKTOP & MOBILE) ================= */
+    /* Oculta a barra lateral padrão para unificar a experiência perfeita com botão flutuante e tela dedicada */
     section[data-testid="stSidebar"] {
-        background-color: #FFFFFF !important;
-        border-right: 1px solid var(--borda-suave);
+        display: none !important;
+    }
+    [data-testid="stSidebarCollapsedControl"] {
+        display: none !important;
     }
     section[data-testid="stSidebar"] .block-container {
         padding-top: 1rem !important;
@@ -878,9 +881,73 @@ custom_css = """
 
     /* ================= DESKTOP (TELAS ACIMA DE 768PX) ================= */
     @media (min-width: 769px) {
-        div.st-key-btn_floating_ir_carrinho,
+        /* Centralizar e limitar largura da tela do carrinho no computador para visual focado e elegante */
+        .block-container:has(.cart-screen-header) {
+            max-width: 740px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+
+        /* Botão Flutuante Inferior no Desktop: centralizado e destacado, acompanhando o scroll */
+        div.st-key-btn_floating_ir_carrinho {
+            position: fixed !important;
+            bottom: 24px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 440px !important;
+            max-width: calc(100vw - 32px) !important;
+            z-index: 999990 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            display: block !important;
+        }
+        div.st-key-btn_floating_ir_carrinho button {
+            width: 100% !important;
+            height: 54px !important;
+            background: linear-gradient(135deg, #183B5E 0%, #0d2238 100%) !important;
+            color: #FFFFFF !important;
+            font-weight: 800 !important;
+            font-size: 1.05rem !important;
+            border-radius: 14px !important;
+            border: 2px solid rgba(255, 255, 255, 0.4) !important;
+            box-shadow: 0 8px 26px rgba(13, 34, 56, 0.45) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
+            letter-spacing: 0.2px !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+        div.st-key-btn_floating_ir_carrinho button:hover {
+            transform: scale(1.02) !important;
+            box-shadow: 0 12px 32px rgba(13, 34, 56, 0.55) !important;
+            border-color: #FCE588 !important;
+        }
+        div.st-key-btn_floating_ir_carrinho button:active {
+            transform: scale(0.99) !important;
+        }
+
+        /* Botão Superior 'Ver / Concluir Pedido' no Desktop */
         div.st-key-btn_top_ir_carrinho {
-            display: none !important;
+            display: block !important;
+            margin-top: 0.25rem !important;
+            margin-bottom: 0.85rem !important;
+        }
+        div.st-key-btn_top_ir_carrinho button {
+            background: linear-gradient(135deg, #183B5E 0%, #0d2238 100%) !important;
+            color: #FFFFFF !important;
+            font-weight: 800 !important;
+            font-size: 1rem !important;
+            border-radius: 12px !important;
+            border: 1.5px solid rgba(255, 255, 255, 0.3) !important;
+            height: 48px !important;
+            box-shadow: 0 4px 14px rgba(24, 59, 94, 0.25) !important;
+            transition: all 0.2s ease !important;
+        }
+        div.st-key-btn_top_ir_carrinho button:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 6px 18px rgba(24, 59, 94, 0.35) !important;
         }
     }
 
@@ -1244,9 +1311,9 @@ header_html = f"""
         </div>
         <div class="header-text-block">
             <h1 class="header-title">CATÁLOGO: PATOVALDO DISTRIBUIDORA</h1>
-            <p class="header-sub">Variedade em bebidas e doces para abastecer seu comércio e transformar seus eventos em Patos de Minas.</p>
+            <p class="header-sub">Variedade em bebidas e doces para comércios e eventos em Patos de Minas.</p>
             <div class="header-tags-row">
-                <div class="header-tag-pill"> 👇 Escolha seus produtos!</div>
+                <div class="header-tag-pill"> 👇Faça seu pedido! Vigência: até 25/09/2026</div>
             </div>
         </div>
     </div>
@@ -1264,10 +1331,10 @@ if total_itens == 0:
 
 
 # ==============================================================================
-# CONTROLE DE TELAS (MOBILE): SE 'ver_carrinho' FOR TRUE, MOSTRA O PEDIDO COMPLETO
+# CONTROLE DE TELAS (DESKTOP & MOBILE): SE 'ver_carrinho' FOR TRUE, MOSTRA O PEDIDO COMPLETO
 # ==============================================================================
 if st.session_state.ver_carrinho and total_itens > 0:
-    # ------------------ TELA DEDICADA DE CONCLUSÃO DO PEDIDO (MOBILE) ------------------
+    # ------------------ TELA DEDICADA DE CONCLUSÃO DO PEDIDO ------------------
     if st.button("← Continuar Comprando (Adicionar mais itens)", key="btn_voltar_topo", use_container_width=True):
         st.session_state.ver_carrinho = False
         st.rerun()
@@ -1404,7 +1471,7 @@ else:
                     st.session_state.categoria_ativa = cat
                     st.rerun()
 
-    # ================== BOTÃO SUPERIOR MOBILE (DIRECIONA IMEDIATAMENTE PARA O PEDIDO) ==================
+    # ================== BOTÃO SUPERIOR (DIRECIONA IMEDIATAMENTE PARA O PEDIDO) ==================
     # Se há itens no carrinho, permite abrir o pedido diretamente daqui sem expanders fechados
     if total_itens > 0:
         if st.button(
@@ -1446,7 +1513,7 @@ else:
                     st.toast(f"✅ {p['nome']} adicionado ao carrinho!", icon="🛒")
                     st.rerun()
 
-    # ================== BOTÃO FLUTUANTE INFERIOR EXCLUSIVO MOBILE ==================
+    # ================== BOTÃO FLUTUANTE INFERIOR (ACOMPANHA O SCROLL DO CLIENTE) ==================
     # Abre diretamente o pedido sem botões intermediários e fica elevado para não ser tapado
     if total_itens > 0:
         texto_itens = "1 item" if total_itens == 1 else f"{total_itens} itens"
