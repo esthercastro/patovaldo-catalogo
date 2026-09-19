@@ -137,11 +137,6 @@ st.markdown(seo_html, unsafe_allow_html=True)
 # ================== CSS CUSTOMIZADO RESPONSIVO (DESKTOP & MOBILE) ==================
 custom_css = """
 <style>
-    /* Rolagem suave para links de âncora */
-    html {
-        scroll-behavior: smooth;
-    }
-
     /* Variáveis Globais de Cores e Tipografia */
     :root {
         --azul-institucional: #183B5E;
@@ -167,10 +162,16 @@ custom_css = """
         box-sizing: border-box !important;
     }
 
-    /* Ocultar elementos padrão do Streamlit */
+    /* Ocultar elementos padrão do Streamlit e Badges de Software que tapam a tela */
     footer {visibility: hidden; display: none !important;}
     #MainMenu {visibility: hidden; display: none !important;}
     [data-testid="stAppDeployButton"] {display: none !important;}
+    [data-testid="stStatusWidget"] {display: none !important; visibility: hidden !important;}
+    [data-testid="stToolbar"] {display: none !important; visibility: hidden !important;}
+    [class*="viewerBadge"] {display: none !important; visibility: hidden !important;}
+    .viewerBadge_container__1QSob {display: none !important; visibility: hidden !important;}
+    [data-testid="manage-app-button"] {display: none !important; visibility: hidden !important;}
+    #stDecoration {display: none !important;}
 
     /* Reduzir faixa em branco no topo */
     header[data-testid="stHeader"] {
@@ -203,7 +204,6 @@ custom_css = """
         position: relative;
         overflow: hidden;
     }
-    /* Efeito de luz dourada sutil */
     .header-container::after {
         content: '';
         position: absolute;
@@ -222,7 +222,6 @@ custom_css = """
         position: relative;
         z-index: 1;
     }
-    /* Card da Logo em Destaque (ampliada e nítida) */
     .header-logo-badge {
         background-color: #FFFFFF;
         border-radius: 14px;
@@ -305,12 +304,6 @@ custom_css = """
         border-radius: 9999px;
         border: 1px solid rgba(255, 255, 255, 0.22);
     }
-    .header-tag-destaque {
-        background: linear-gradient(135deg, #25D366 0%, #15803D 100%) !important;
-        border: 1px solid rgba(37, 211, 102, 0.6) !important;
-        color: #FFFFFF !important;
-        box-shadow: 0 2px 8px rgba(37, 211, 102, 0.35);
-    }
 
     /* Barra de Pesquisa */
     div[data-baseweb="input"] {
@@ -359,20 +352,12 @@ custom_css = """
         color: #0F172A !important;
         border-color: #CBD5E1 !important;
     }
-    /* Estado Selecionado: #1E3A8A, sem borda vermelha/rosa */
     div[data-testid="stPills"] button[aria-selected="true"],
     div[data-testid="stPills"] button[data-checked="true"] {
         background-color: var(--azul-selecionado) !important;
         color: #FFFFFF !important;
         border: 1px solid var(--azul-selecionado) !important;
         box-shadow: 0 2px 4px rgba(30, 58, 138, 0.25) !important;
-    }
-    div[data-testid="stPills"] button:focus,
-    div[data-testid="stPills"] button:focus-visible,
-    div[data-testid="stPills"] button:active {
-        outline: none !important;
-        box-shadow: none !important;
-        border-color: var(--azul-selecionado) !important;
     }
 
     /* Fallback para botões horizontais */
@@ -509,8 +494,7 @@ custom_css = """
     }
 
     /* Botão 'Adicionar' Padronizado */
-    div[class*="st-key-add_"] button,
-    div[class*="st-key-m_add_"] button {
+    div[class*="st-key-add_"] button {
         background-color: var(--verde-botao) !important;
         color: #FFFFFF !important;
         border: none !important;
@@ -527,8 +511,7 @@ custom_css = """
         align-items: center !important;
         justify-content: center !important;
     }
-    div[class*="st-key-add_"] button:hover,
-    div[class*="st-key-m_add_"] button:hover {
+    div[class*="st-key-add_"] button:hover {
         background-color: var(--verde-botao-hover) !important;
         box-shadow: 0 4px 8px rgba(22, 163, 74, 0.3) !important;
         transform: translateY(-1px);
@@ -563,7 +546,7 @@ custom_css = """
         margin: 2px 0 0 0;
     }
 
-    /* Card de Item no Carrinho - Limpo sem fórmula matemática */
+    /* Card de Item no Carrinho */
     .cart-card {
         background: #F8FAFC;
         border: 1px solid var(--borda-suave);
@@ -599,14 +582,8 @@ custom_css = """
         margin-top: 2px;
     }
 
-    /* Botões de quantidade alinhados */
-    div[data-testid="stSidebar"] div[data-testid="stHorizontalBlock"],
-    .st-key-carrinho_mobile_expander div[data-testid="stHorizontalBlock"] {
-        align-items: center !important;
-    }
-
-    /* Botão WhatsApp */
-    .btn-whatsapp {
+    /* Botão WhatsApp Desktop Sidebar */
+    .btn-whatsapp-sidebar {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -623,26 +600,103 @@ custom_css = """
         margin-top: 10px;
         margin-bottom: 12px;
     }
-    .btn-whatsapp:hover {
+    .btn-whatsapp-sidebar:hover {
         background-color: var(--verde-hover);
         box-shadow: 0 6px 16px rgba(37, 211, 102, 0.4);
         transform: translateY(-1px);
         color: #FFFFFF !important;
     }
 
+    /* ================= TELA DO CARRINHO MOBILE: BOTÃO WHATSAPP EM LARGURA TOTAL E CENTRALIZADO ================= */
+    .cart-screen-container {
+        background-color: #FFFFFF;
+        border-radius: 14px;
+        border: 1px solid var(--borda-suave);
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    }
+    .cart-screen-header {
+        background: linear-gradient(135deg, #0d2238 0%, #183B5E 100%);
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin-bottom: 1rem;
+        color: #FFFFFF;
+    }
+    .cart-screen-header h2 {
+        color: #FFFFFF !important;
+        font-size: 1.22rem !important;
+        margin: 0 !important;
+        font-weight: 800;
+    }
+    .cart-screen-header p {
+        color: #E2E8F0;
+        font-size: 0.8rem;
+        margin: 2px 0 0 0;
+    }
+    .btn-whatsapp-concluir {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        background-color: var(--verde-whatsapp) !important;
+        color: #FFFFFF !important;
+        text-align: center !important;
+        padding: 16px 20px !important;
+        border-radius: 12px !important;
+        font-weight: 800 !important;
+        font-size: 1.05rem !important;
+        text-decoration: none !important;
+        box-shadow: 0 4px 16px rgba(37, 211, 102, 0.35) !important;
+        transition: all 0.2s ease !important;
+        margin-top: 14px !important;
+        margin-bottom: 14px !important;
+        box-sizing: border-box !important;
+    }
+    .btn-whatsapp-concluir:hover,
+    .btn-whatsapp-concluir:active {
+        background-color: var(--verde-hover) !important;
+        box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5) !important;
+        color: #FFFFFF !important;
+    }
+
+    /* Botão de navegação 'Voltar às Compras' */
+    div.st-key-btn_voltar_topo button,
+    div.st-key-btn_voltar_baixo button {
+        background-color: #F1F5F9 !important;
+        color: var(--azul-institucional) !important;
+        border: 1.5px solid var(--azul-institucional) !important;
+        font-weight: 700 !important;
+        font-size: 0.9rem !important;
+        height: 46px !important;
+        border-radius: 10px !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    /* ================= BOTÃO SUPERIOR MOBILE (VER / CONCLUIR PEDIDO) ================= */
+    div.st-key-btn_top_ir_carrinho button {
+        background: linear-gradient(135deg, #183B5E 0%, #0d2238 100%) !important;
+        color: #FFFFFF !important;
+        font-weight: 800 !important;
+        font-size: 0.95rem !important;
+        border-radius: 10px !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+        height: 48px !important;
+        box-shadow: 0 4px 12px rgba(24, 59, 94, 0.25) !important;
+        margin-top: 0.25rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+
     /* ================= DESKTOP (TELAS ACIMA DE 768PX) ================= */
     @media (min-width: 769px) {
-        /* Barra móvel e expander mobile ocultos no Desktop */
-        .mobile-floating-bar,
-        .st-key-carrinho_mobile_expander,
-        .mobile-cart-marker {
+        div.st-key-btn_floating_ir_carrinho,
+        div.st-key-btn_top_ir_carrinho {
             display: none !important;
         }
     }
 
     /* ================= MOBILE (TELAS ATÉ 768PX) ================= */
     @media (max-width: 768px) {
-        /* Ocultar sidebar no mobile para dar foco ao expander in-page e barra flutuante */
         section[data-testid="stSidebar"] {
             display: none !important;
         }
@@ -650,16 +704,13 @@ custom_css = """
             display: none !important;
         }
 
-        /* Espaçamento superior e inferior seguro */
         .block-container {
             padding-left: 0.75rem !important;
             padding-right: 0.75rem !important;
             padding-top: 0.5rem !important;
-            padding-bottom: 115px !important;
-            padding-bottom: calc(115px + env(safe-area-inset-bottom, 0px)) !important;
+            padding-bottom: 100px !important;
         }
 
-        /* Cabeçalho Compacto e Marcante Mobile */
         .header-container {
             padding: 0.75rem 0.9rem !important;
             margin-bottom: 0.55rem !important;
@@ -700,38 +751,6 @@ custom_css = """
             padding: 2px 7px !important;
         }
 
-        /* ================= ESTILIZAÇÃO DO EXPANDER DE CARRINHO MOBILE ================= */
-        .st-key-carrinho_mobile_expander {
-            background-color: #FFFFFF !important;
-            border: 2px solid var(--azul-institucional) !important;
-            border-radius: 12px !important;
-            box-shadow: 0 4px 14px rgba(24, 59, 94, 0.12) !important;
-            margin-top: 0.4rem !important;
-            margin-bottom: 0.85rem !important;
-            overflow: hidden !important;
-        }
-        .st-key-carrinho_mobile_expander details {
-            border-radius: 10px !important;
-        }
-        .st-key-carrinho_mobile_expander summary {
-            background: linear-gradient(135deg, #183B5E 0%, #0d2238 100%) !important;
-            color: #FFFFFF !important;
-            font-weight: 800 !important;
-            font-size: 0.95rem !important;
-            padding: 11px 14px !important;
-            border-radius: 10px !important;
-        }
-        .st-key-carrinho_mobile_expander summary:hover {
-            background: linear-gradient(135deg, #1f4e7d 0%, #183B5E 100%) !important;
-        }
-        .st-key-carrinho_mobile_expander summary span {
-            color: #FFFFFF !important;
-        }
-        .st-key-carrinho_mobile_expander summary svg {
-            fill: #FFFFFF !important;
-        }
-
-        /* Imagens compactas e centradas */
         .product-img-container {
             height: 140px !important;
             padding: 6px !important;
@@ -748,7 +767,6 @@ custom_css = """
             padding: 10px !important;
         }
 
-        /* Grade responsiva em 2 colunas no celular */
         div[data-testid="stHorizontalBlock"]:has(.product-card) {
             display: flex !important;
             flex-direction: row !important;
@@ -762,83 +780,35 @@ custom_css = """
             margin-bottom: 8px !important;
         }
 
-        /* ================= BARRA FIXA DO WHATSAPP COM BOTÃO DE VER CARRINHO (MOBILE) ================= */
-        .mobile-floating-bar {
-            display: block !important;
+        /* ================= BOTÃO FLUTUANTE INFERIOR EXCLUSIVO MOBILE ================= */
+        /* Elevado com margens seguras para nunca ser tapado por barras ou ícones de sistema */
+        div.st-key-btn_floating_ir_carrinho {
             position: fixed !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
+            bottom: 18px !important;
+            left: 16px !important;
+            right: 16px !important;
+            z-index: 999990 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        div.st-key-btn_floating_ir_carrinho button {
             width: 100% !important;
-            background-color: #FFFFFF !important;
-            border-top: 1px solid var(--borda-suave) !important;
-            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.12) !important;
-            z-index: 999999 !important;
-            padding: 8px 12px !important;
-            padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
-            box-sizing: border-box !important;
-        }
-        .mobile-floating-content {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            max-width: 600px !important;
-            margin: 0 auto !important;
-            gap: 8px !important;
-        }
-        .mobile-floating-info-link {
-            display: flex !important;
-            flex-direction: column !important;
-            text-decoration: none !important;
-            flex-shrink: 0 !important;
-        }
-        .mobile-floating-qtd {
-            font-size: 0.74rem !important;
-            font-weight: 600 !important;
-            color: var(--texto-secundario) !important;
-        }
-        .mobile-floating-total {
-            font-size: 1.08rem !important;
-            font-weight: 800 !important;
-            color: var(--azul-institucional) !important;
-            line-height: 1.15 !important;
-        }
-        .mobile-floating-btn-cart {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            background-color: #F1F5F9 !important;
-            color: var(--azul-institucional) !important;
-            border: 1.5px solid var(--azul-institucional) !important;
-            padding: 8px 10px !important;
-            border-radius: 8px !important;
-            font-weight: 700 !important;
-            font-size: 0.8rem !important;
-            text-decoration: none !important;
-            min-height: 40px !important;
-            white-space: nowrap !important;
-            transition: all 0.15s ease !important;
-        }
-        .mobile-floating-btn-cart:active {
-            background-color: #E2E8F0 !important;
-        }
-        .mobile-floating-btn {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            background-color: var(--verde-whatsapp) !important;
+            height: 52px !important;
+            background: linear-gradient(135deg, #183B5E 0%, #0d2238 100%) !important;
             color: #FFFFFF !important;
-            padding: 8px 14px !important;
-            border-radius: 8px !important;
             font-weight: 800 !important;
-            font-size: 0.86rem !important;
-            text-decoration: none !important;
-            box-shadow: 0 2px 6px rgba(37, 211, 102, 0.3) !important;
-            min-height: 40px !important;
-            white-space: nowrap !important;
+            font-size: 1.02rem !important;
+            border-radius: 12px !important;
+            border: 2px solid rgba(255, 255, 255, 0.4) !important;
+            box-shadow: 0 8px 24px rgba(13, 34, 56, 0.45) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
+            letter-spacing: 0.2px !important;
         }
-        .mobile-floating-btn:active {
-            background-color: var(--verde-hover) !important;
+        div.st-key-btn_floating_ir_carrinho button:active {
+            transform: scale(0.98) !important;
         }
     }
 </style>
@@ -854,6 +824,8 @@ if 'endereco' not in st.session_state:
     st.session_state.endereco = ""
 if 'cupom' not in st.session_state:
     st.session_state.cupom = ""
+if 'ver_carrinho' not in st.session_state:
+    st.session_state.ver_carrinho = False
 
 
 # Callbacks para sincronização bidirecional de campos entre Mobile e Sidebar
@@ -910,7 +882,6 @@ def parse_descricao(descricao: str) -> tuple[str, str]:
 
 def linhas_para_produtos(csv_texto: str) -> list[dict]:
     produtos_lidos = []
-    # Suporte flexível automático para separadores de vírgula ou ponto-e-vírgula
     primeira_linha = csv_texto.splitlines()[0] if csv_texto.splitlines() else ""
     delimitador = ";" if ";" in primeira_linha else ","
     leitor = csv.DictReader(io.StringIO(csv_texto), delimiter=delimitador)
@@ -1021,7 +992,7 @@ def gerar_link_whatsapp(carrinho: dict, total_sub: float, endereco: str, cupom: 
     return f"https://wa.me/{NUMERO_WHATSAPP}?text={quote(msg)}"
 
 
-# ================== CABEÇALHO HERO PREMIUM & CHAMATIVO ==================
+# ================== CABEÇALHO HERO (SEMPRE VISÍVEL) ==================
 logo_src = f"data:image/png;base64,{LOGO_B64}" if LOGO_B64 else LOGO_PATH
 header_html = f"""
 <div class="header-container">
@@ -1041,164 +1012,208 @@ header_html = f"""
 """
 st.markdown(header_html, unsafe_allow_html=True)
 
-# ================== PESQUISA ==================
-busca = st.text_input(
-    "Buscar produtos",
-    placeholder="🔍 Buscar bebida, doce, marca...",
-    label_visibility="collapsed"
-)
-
-# ================== CATEGORIAS (LINHA ÚNICA HORIZONTAL) ==================
-categorias_existentes = sorted({p["categoria"] for p in produtos})
-categorias = ["Todos"]
-for pref in ORDEM_CATEGORIAS_PREFERIDA:
-    if pref.capitalize() in categorias_existentes:
-        categorias.append(pref.capitalize())
-for c in categorias_existentes:
-    if c not in categorias:
-        categorias.append(c)
-
-if hasattr(st, "pills"):
-    idx_padrao = categorias.index(st.session_state.categoria_ativa) if st.session_state.categoria_ativa in categorias else 0
-    cat_selecionada = st.pills(
-        "Categorias",
-        options=categorias,
-        default=categorias[idx_padrao],
-        key="pills_categorias",
-        label_visibility="collapsed"
-    )
-    if cat_selecionada and cat_selecionada != st.session_state.categoria_ativa:
-        st.session_state.categoria_ativa = cat_selecionada
-        st.rerun()
-    elif not cat_selecionada and st.session_state.categoria_ativa != "Todos":
-        st.session_state.categoria_ativa = "Todos"
-        st.rerun()
-else:
-    cols_cat = st.columns(len(categorias))
-    for col, cat in zip(cols_cat, categorias):
-        with col:
-            tipo_btn = "primary" if st.session_state.categoria_ativa == cat else "secondary"
-            if st.button(cat, use_container_width=True, type=tipo_btn, key=f"cat_{cat}"):
-                st.session_state.categoria_ativa = cat
-                st.rerun()
-
-# ================== FILTRAGEM DOS PRODUTOS ==================
-termo_busca = busca.strip().lower()
-prod_filtrados = [
-    p for p in produtos
-    if (st.session_state.categoria_ativa == "Todos" or p["categoria"] == st.session_state.categoria_ativa)
-    and (not termo_busca or termo_busca in p["nome"].lower() or termo_busca in p["categoria"].lower())
-]
-
 # Totalizadores do Carrinho
 total_itens = sum(item["qtd"] for item in st.session_state.carrinho.values())
 total_subitens = sum(item["preco"] * item["qtd"] for item in st.session_state.carrinho.values())
 
-# ================== CARRINHO EXPANSÍVEL (EXCLUSIVO MOBILE) ==================
-# Exibido no topo da página no celular quando há produtos no carrinho
-if total_itens > 0:
-    st.markdown('<div id="carrinho-mobile" class="mobile-cart-marker"></div>', unsafe_allow_html=True)
-    with st.expander(
-        f"🛒 Ver / Concluir Pedido ({total_itens} {'item' if total_itens == 1 else 'itens'} • R$ {total_subitens:.2f})",
-        expanded=False,
-        key="carrinho_mobile_expander"
-    ):
-        st.markdown("<h4 style='color:#183B5E; margin:0 0 10px 0; font-size:1.05rem; font-weight:800;'>🛍️ Itens no seu Carrinho</h4>", unsafe_allow_html=True)
+# Se o carrinho esvaziou, garante retorno ao catálogo
+if total_itens == 0:
+    st.session_state.ver_carrinho = False
 
-        for item_id, item in list(st.session_state.carrinho.items()):
-            render_cart_item(item)
 
-            m1, m2, m3 = st.columns([1, 1, 1])
-            if m1.button("−", key=f"m_dec_{item_id}", use_container_width=True):
-                if item['qtd'] > 1:
-                    item['qtd'] -= 1
-                else:
-                    del st.session_state.carrinho[item_id]
-                st.rerun()
+# ==============================================================================
+# CONTROLE DE TELAS (MOBILE): SE 'ver_carrinho' FOR TRUE, MOSTRA O PEDIDO COMPLETO
+# ==============================================================================
+if st.session_state.ver_carrinho and total_itens > 0:
+    # ------------------ TELA DEDICADA DE CONCLUSÃO DO PEDIDO (MOBILE) ------------------
+    if st.button("← Continuar Comprando (Adicionar mais itens)", key="btn_voltar_topo", use_container_width=True):
+        st.session_state.ver_carrinho = False
+        st.rerun()
 
-            m2.markdown(
-                f"<div style='text-align:center; color:#1E293B; font-weight:700; padding-top:6px;'>{item['qtd']}</div>",
-                unsafe_allow_html=True
-            )
+    st.markdown(f"""
+        <div class="cart-screen-header">
+            <h2>🛒 Conferir e Finalizar Pedido</h2>
+            <p>{total_itens} {'item' if total_itens == 1 else 'itens'} selecionados</p>
+        </div>
+    """, unsafe_allow_html=True)
 
-            if m3.button("＋", key=f"m_inc_{item_id}", use_container_width=True):
-                item['qtd'] += 1
-                st.rerun()
-
-        st.markdown("<hr style='margin: 1rem 0; border-color: #E2E8F0;'>", unsafe_allow_html=True)
-
-        # Dados para entrega
-        st.markdown("<p style='font-weight:700; color:#1E293B; font-size:0.9rem; margin-bottom:4px;'>📍 Endereço de Entrega (Opcional):</p>", unsafe_allow_html=True)
-        st.text_input(
-            "Endereço de entrega:",
-            placeholder="Ex: Rua Major Gote, 1200 - Centro",
-            label_visibility="collapsed",
-            key="m_endereco_input",
-            on_change=sync_mobile_inputs
-        )
-
-        if CAMINHO_MAPA and CAMINHO_MAPA.exists():
-            with st.expander("🗺️ Ver Zonas de Entrega e Taxas", key="m_exp_zonas"):
-                st.image(str(CAMINHO_MAPA), caption="Zonas de Entrega em Patos de Minas", use_container_width=True)
-
-        # Campo Cupom (Facultativo / Opcional)
-        st.markdown("<p style='font-weight:700; color:#1E293B; font-size:0.9rem; margin-top:8px; margin-bottom:4px;'>🏷️ Cupom (Opcional):</p>", unsafe_allow_html=True)
-        st.text_input(
-            "Cupom:",
-            placeholder="Ex: PATOVALDO10",
-            label_visibility="collapsed",
-            key="m_cupom_input",
-            on_change=sync_mobile_inputs
-        )
-
-        st.markdown(f"""
-            <div style="background-color:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:12px; margin: 12px 0;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-weight:600; color:#166534;">Subtotal do Pedido:</span>
-                    <span style="font-size:1.25rem; font-weight:800; color:#15803D;">R$ {total_subitens:.2f}</span>
-                </div>
-                <div style="font-size:0.75rem; color:#166534; margin-top:2px;">* Taxa de entrega calculada via WhatsApp</div>
-            </div>
-        """, unsafe_allow_html=True)
-
-        link_zap_mobile = gerar_link_whatsapp(
-            st.session_state.carrinho, total_subitens, st.session_state.endereco, st.session_state.cupom
-        )
-
-        st.markdown(f"""
-            <a href="{link_zap_mobile}" target="_blank" class="btn-whatsapp">
-                📲 Finalizar Pedido no WhatsApp
-            </a>
-        """, unsafe_allow_html=True)
-
-        if st.button("🗑️ Limpar Carrinho", key="m_limpar_carrinho", use_container_width=True):
-            st.session_state.carrinho = {}
+    # Lista dos produtos no carrinho com ajuste de quantidade
+    for item_id, item in list(st.session_state.carrinho.items()):
+        render_cart_item(item)
+        m1, m2, m3 = st.columns([1, 1, 1])
+        if m1.button("−", key=f"m_dec_{item_id}", use_container_width=True):
+            if item['qtd'] > 1:
+                item['qtd'] -= 1
+            else:
+                del st.session_state.carrinho[item_id]
             st.rerun()
 
-# ================== GRADE DE PRODUTOS ==================
-if not prod_filtrados:
-    st.info(f"Nenhum produto encontrado para a categoria **{st.session_state.categoria_ativa}** ou termo de busca.")
-else:
-    num_colunas = 4
-    cols = st.columns(num_colunas)
-    for idx, p in enumerate(prod_filtrados):
-        with cols[idx % num_colunas]:
-            render_product_card(p)
+        m2.markdown(
+            f"<div style='text-align:center; color:#1E293B; font-weight:700; padding-top:6px;'>{item['qtd']}</div>",
+            unsafe_allow_html=True
+        )
 
-            if st.button("➕ Adicionar", key=f"add_{p['id']}", use_container_width=True):
-                if p['id'] in st.session_state.carrinho:
-                    st.session_state.carrinho[p['id']]['qtd'] += 1
-                else:
-                    st.session_state.carrinho[p['id']] = {
-                        "nome": p['nome'],
-                        "preco": p['preco'],
-                        "imagem": p['imagem'],
-                        "qtd": 1
-                    }
-                st.toast(f"✅ {p['nome']} adicionado ao carrinho!", icon="🛒")
-                st.rerun()
+        if m3.button("＋", key=f"m_inc_{item_id}", use_container_width=True):
+            item['qtd'] += 1
+            st.rerun()
+
+    st.markdown("<hr style='margin: 1.25rem 0; border-color: #E2E8F0;'>", unsafe_allow_html=True)
+
+    # Informações de entrega
+    st.markdown("<p style='font-weight:700; color:#1E293B; font-size:0.95rem; margin-bottom:4px;'>📍 Endereço de Entrega (Opcional):</p>", unsafe_allow_html=True)
+    st.text_input(
+        "Endereço de entrega:",
+        placeholder="Ex: Rua Major Gote, 1200 - Centro",
+        label_visibility="collapsed",
+        key="m_endereco_input",
+        on_change=sync_mobile_inputs
+    )
+
+    if CAMINHO_MAPA and CAMINHO_MAPA.exists():
+        with st.expander("🗺️ Ver Zonas de Entrega e Taxas em Patos de Minas"):
+            st.image(str(CAMINHO_MAPA), caption="Zonas de Entrega em Patos de Minas", use_container_width=True)
+
+    # Campo Cupom (Facultativo / Opcional)
+    st.markdown("<p style='font-weight:700; color:#1E293B; font-size:0.95rem; margin-top:10px; margin-bottom:4px;'>🏷️ Cupom (Opcional):</p>", unsafe_allow_html=True)
+    st.text_input(
+        "Cupom:",
+        placeholder="Ex: PATOVALDO10",
+        label_visibility="collapsed",
+        key="m_cupom_input",
+        on_change=sync_mobile_inputs
+    )
+
+    st.markdown(f"""
+        <div style="background-color:#F0FDF4; border:1px solid #BBF7D0; border-radius:10px; padding:14px; margin: 16px 0;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:700; color:#166534; font-size:1.05rem;">Subtotal do Pedido:</span>
+                <span style="font-size:1.4rem; font-weight:900; color:#15803D;">R$ {total_subitens:.2f}</span>
+            </div>
+            <div style="font-size:0.8rem; color:#166534; margin-top:4px;">* Taxa de entrega calculada e confirmada via WhatsApp</div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    link_zap_mobile = gerar_link_whatsapp(
+        st.session_state.carrinho, total_subitens, st.session_state.endereco, st.session_state.cupom
+    )
+
+    # BOTÃO PRINCIPAL WHATSAPP: CENTRALIZADO, LARGURA TOTAL E LIVRE DE QUALQUER ÍCONE DE CANTO
+    st.markdown(f"""
+        <a href="{link_zap_mobile}" target="_blank" class="btn-whatsapp-concluir">
+            📲 Finalizar Pedido no WhatsApp (R$ {total_subitens:.2f})
+        </a>
+    """, unsafe_allow_html=True)
+
+    col_b1, col_b2 = st.columns(2)
+    with col_b1:
+        if st.button("← Adicionar Mais Itens", key="btn_voltar_baixo", use_container_width=True):
+            st.session_state.ver_carrinho = False
+            st.rerun()
+    with col_b2:
+        if st.button("🗑️ Limpar Carrinho", key="m_limpar_carrinho", use_container_width=True):
+            st.session_state.carrinho = {}
+            st.session_state.ver_carrinho = False
+            st.rerun()
+
+else:
+    # ------------------ TELA DO CATÁLOGO DE PRODUTOS ------------------
+    # ================== PESQUISA ==================
+    busca = st.text_input(
+        "Buscar produtos",
+        placeholder="🔍 Buscar bebida, doce, marca...",
+        label_visibility="collapsed"
+    )
+
+    # ================== CATEGORIAS (LINHA ÚNICA HORIZONTAL) ==================
+    categorias_existentes = sorted({p["categoria"] for p in produtos})
+    categorias = ["Todos"]
+    for pref in ORDEM_CATEGORIAS_PREFERIDA:
+        if pref.capitalize() in categorias_existentes:
+            categorias.append(pref.capitalize())
+    for c in categorias_existentes:
+        if c not in categorias:
+            categorias.append(c)
+
+    if hasattr(st, "pills"):
+        idx_padrao = categorias.index(st.session_state.categoria_ativa) if st.session_state.categoria_ativa in categorias else 0
+        cat_selecionada = st.pills(
+            "Categorias",
+            options=categorias,
+            default=categorias[idx_padrao],
+            key="pills_categorias",
+            label_visibility="collapsed"
+        )
+        if cat_selecionada and cat_selecionada != st.session_state.categoria_ativa:
+            st.session_state.categoria_ativa = cat_selecionada
+            st.rerun()
+        elif not cat_selecionada and st.session_state.categoria_ativa != "Todos":
+            st.session_state.categoria_ativa = "Todos"
+            st.rerun()
+    else:
+        cols_cat = st.columns(len(categorias))
+        for col, cat in zip(cols_cat, categorias):
+            with col:
+                tipo_btn = "primary" if st.session_state.categoria_ativa == cat else "secondary"
+                if st.button(cat, use_container_width=True, type=tipo_btn, key=f"cat_{cat}"):
+                    st.session_state.categoria_ativa = cat
+                    st.rerun()
+
+    # ================== BOTÃO SUPERIOR MOBILE (DIRECIONA IMEDIATAMENTE PARA O PEDIDO) ==================
+    # Se há itens no carrinho, permite abrir o pedido diretamente daqui sem expanders fechados
+    if total_itens > 0:
+        if st.button(
+            f"🛒 Ver / Concluir Pedido ({total_itens} {'item' if total_itens == 1 else 'itens'} • R$ {total_subitens:.2f}) ➔",
+            key="btn_top_ir_carrinho",
+            use_container_width=True
+        ):
+            st.session_state.ver_carrinho = True
+            st.rerun()
+
+    # ================== FILTRAGEM DOS PRODUTOS ==================
+    termo_busca = busca.strip().lower()
+    prod_filtrados = [
+        p for p in produtos
+        if (st.session_state.categoria_ativa == "Todos" or p["categoria"] == st.session_state.categoria_ativa)
+        and (not termo_busca or termo_busca in p["nome"].lower() or termo_busca in p["categoria"].lower())
+    ]
+
+    # ================== GRADE DE PRODUTOS ==================
+    if not prod_filtrados:
+        st.info(f"Nenhum produto encontrado para a categoria **{st.session_state.categoria_ativa}** ou termo de busca.")
+    else:
+        num_colunas = 4
+        cols = st.columns(num_colunas)
+        for idx, p in enumerate(prod_filtrados):
+            with cols[idx % num_colunas]:
+                render_product_card(p)
+
+                if st.button("➕ Adicionar", key=f"add_{p['id']}", use_container_width=True):
+                    if p['id'] in st.session_state.carrinho:
+                        st.session_state.carrinho[p['id']]['qtd'] += 1
+                    else:
+                        st.session_state.carrinho[p['id']] = {
+                            "nome": p['nome'],
+                            "preco": p['preco'],
+                            "imagem": p['imagem'],
+                            "qtd": 1
+                        }
+                    st.toast(f"✅ {p['nome']} adicionado ao carrinho!", icon="🛒")
+                    st.rerun()
+
+    # ================== BOTÃO FLUTUANTE INFERIOR EXCLUSIVO MOBILE ==================
+    # Abre diretamente o pedido sem botões intermediários e fica elevado para não ser tapado
+    if total_itens > 0:
+        texto_itens = "1 item" if total_itens == 1 else f"{total_itens} itens"
+        if st.button(
+            f"🛒 Ver Pedido ({texto_itens} • R$ {total_subitens:.2f}) ➔",
+            key="btn_floating_ir_carrinho"
+        ):
+            st.session_state.ver_carrinho = True
+            st.rerun()
+
 
 # ================== SIDEBAR (DESKTOP - SEU PEDIDO) ==================
+# No desktop, a barra lateral continua visível e permanente à esquerda
 with st.sidebar:
     st.markdown(f"""
         <div class="sidebar-header">
@@ -1217,10 +1232,8 @@ with st.sidebar:
         """, unsafe_allow_html=True)
     else:
         for item_id, item in list(st.session_state.carrinho.items()):
-            # Card individual de produto no carrinho
             render_cart_item(item)
 
-            # Controles de quantidade (+, -, remover)
             c1, c2, c3 = st.columns([1, 1, 1])
             if c1.button("−", key=f"s_dec_{item_id}", use_container_width=True):
                 if item['qtd'] > 1:
@@ -1274,13 +1287,13 @@ with st.sidebar:
             </div>
         """, unsafe_allow_html=True)
 
-        link_whatsapp = gerar_link_whatsapp(
+        link_whatsapp_sidebar = gerar_link_whatsapp(
             st.session_state.carrinho, total_subitens, st.session_state.endereco, st.session_state.cupom
         )
 
-        # Botão de Envio para o WhatsApp
+        # Botão de Envio para o WhatsApp Sidebar
         st.markdown(f"""
-            <a href="{link_whatsapp}" target="_blank" class="btn-whatsapp">
+            <a href="{link_whatsapp_sidebar}" target="_blank" class="btn-whatsapp-sidebar">
                 📲 Finalizar Pedido no WhatsApp
             </a>
         """, unsafe_allow_html=True)
@@ -1288,27 +1301,3 @@ with st.sidebar:
         if st.button("🗑️ Limpar Carrinho", key="s_limpar_carrinho", use_container_width=True):
             st.session_state.carrinho = {}
             st.rerun()
-
-# ================== BARRA FIXA DO WHATSAPP COM LINK DO CARRINHO (EXCLUSIVA MOBILE) ==================
-# Exibida de forma fixa na parte inferior do celular quando há itens no carrinho
-if total_itens > 0:
-    link_zap_float = gerar_link_whatsapp(
-        st.session_state.carrinho, total_subitens, st.session_state.endereco, st.session_state.cupom
-    )
-    texto_qtd = "1 item" if total_itens == 1 else f"{total_itens} itens"
-    st.markdown(f"""
-        <div class="mobile-floating-bar">
-            <div class="mobile-floating-content">
-                <a href="#carrinho-mobile" class="mobile-floating-info-link" title="Toque para ver os produtos">
-                    <span class="mobile-floating-qtd">🛒 {texto_qtd}</span>
-                    <span class="mobile-floating-total">R$ {total_subitens:.2f}</span>
-                </a>
-                <a href="#carrinho-mobile" class="mobile-floating-btn-cart">
-                    Ver Pedido 📝
-                </a>
-                <a href="{link_zap_float}" target="_blank" class="mobile-floating-btn">
-                    Pedir no Zap ➔
-                </a>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
