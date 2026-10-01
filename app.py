@@ -1373,7 +1373,7 @@ if st.session_state.ver_carrinho and total_itens > 0:
     st.markdown("<hr style='margin: 1.25rem 0; border-color: #E2E8F0;'>", unsafe_allow_html=True)
 
     # Informações de entrega
-    st.markdown("<p style='font-weight:700; color:#1E293B; font-size:0.95rem; margin-bottom:4px;'>📍 Endereço de Entrega (Opcional):</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-weight:700; color:#1E293B; font-size:0.95rem; margin-bottom:4px;'>📍 Endereço de Entrega (Obrigatório):</p>", unsafe_allow_html=True)
     st.text_input(
         "Endereço de entrega:",
         placeholder="Ex: Rua Major Gote, 1200 - Centro",
