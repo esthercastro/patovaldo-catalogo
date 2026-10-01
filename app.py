@@ -1313,7 +1313,7 @@ header_html = f"""
             <h1 class="header-title">CATÁLOGO: PATOVALDO DISTRIBUIDORA</h1>
             <p class="header-sub">Variedade em bebidas e doces para comércios e eventos em Patos de Minas.</p>
             <div class="header-tags-row">
-                <div class="header-tag-pill"> Escolha os produtos no catálogo👇 Revise o carrinho🧾 Confira endereço (veja as Zonas de Taxa e seus valores) e cupom, se houver📍 Finalize pelo WhatsApp com nossos vendedores📲 </div>
+                <div class="header-tag-pill"> Você será direcionado automaticamente para o WhatsApp para finalizar seu pedido! 📲 </div>
             </div>
         </div>
     </div>
